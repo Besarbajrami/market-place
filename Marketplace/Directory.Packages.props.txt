@@ -1,0 +1,15 @@
+PM> dotnet tool restore
+Tool 'dotnet-ef' (version '10.0.2') was restored. Available commands: dotnet-ef
+
+Restore was successful.
+PM> dotnet tool run dotnet-ef migrations add AddCategories --project src/Marketplace.Infrastructure --startup-project src/Marketplace.Api --output-dir Persistence/Migrations
+Build started...
+Build succeeded.
+System.MissingMethodException: Method not found: 'System.String Microsoft.EntityFrameworkCore.Diagnostics.AbstractionsStrings.ArgumentIsEmpty(System.Object)'.
+   at Microsoft.EntityFrameworkCore.Utilities.Check.NotEmpty(String value, String parameterName)
+   at Microsoft.EntityFrameworkCore.Utilities.Check.NotEmpty(String value, String parameterName)
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.AddMigrationImpl(String name, String outputDir, String contextType, String namespace, Boolean dryRun)
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.AddMigration.<>c__DisplayClass0_0.<.ctor>b__0()
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.OperationBase.<>c__DisplayClass3_0`1.<Execute>b__0()
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.OperationBase.Execute(Action action)
+Method not found: 'System.String Microsoft.EntityFrameworkCore.Diagnostics.AbstractionsStrings.ArgumentIsEmpty(System.Object)'.

@@ -1,0 +1,16 @@
+# Visual Studio
+.vs/
+
+# .NET
+bin/
+obj/
+
+# Logs
+*.log
+
+# User uploads (runtime data)
+wwwroot/uploads/
+
+# OS
+Thumbs.db
+.DS_Store

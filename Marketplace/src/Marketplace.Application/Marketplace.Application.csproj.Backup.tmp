@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Marketplace.Domain\Marketplace.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\Exceptions\" />
+    <Folder Include="Common\Behaviors\" />
+    <Folder Include="Common\Interfaces\NewFolder\" />
+    <Folder Include="Features\Queries\" />
+    <Folder Include="Features\Commands\" />
+    <Folder Include="Features\Listings\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

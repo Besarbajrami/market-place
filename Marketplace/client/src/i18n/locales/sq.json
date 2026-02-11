@@ -1,0 +1,98 @@
+{
+    "search": "Kërko",
+    "price": "Çmimi",
+    "city": "Qyteti",
+    "condition": "Gjendja",
+    "new": "I ri",
+    "used": "I përdorur",
+    "editListing": "Ndrysho shpalljen",
+    
+    
+        "common": {
+          "loading": "Duke u ngarkuar",
+          "NotFound": "Nuk u gjet",
+      
+          "ContinueToImages": "Vazhdo te fotot",
+          "ContinueToReview": "Vazhdo te përmbledhja",
+          "SaveListing": "Ruaj shpalljen",
+      
+          "Images": "Foto",
+          "Review": "Përmbledhje",
+          "SetCover": "Vendos kopertinën",
+      
+          "FEATURED": "E VECUAR",
+          "URGENT": "URGJENTE",
+      
+          "Description": "Përshkrimi",
+          "ContactSeller": "Kontakto shitësin",
+          "Views": "Shikime",
+          "Seller": "Shitësi",
+          "ViewSellerListings": "Shiko shpalljet e shitësit",
+      
+          "NoImagesYet": "Ende nuk ka foto",
+          "CoverImage": "Foto e kopertinës",
+          "SetAsCover": "Vendos si kopertinë",
+      
+          "Search": "Kërko",
+          "Filters": "Filtra",
+          "Category": "Kategori",
+          "IncludeSubcategories": "Përfshi nënkategori",
+          "AnyCondition": "Çdo gjendje",
+          "Used": "E përdorur",
+          "New": "E re",
+          "Newest": "Më të rejat",
+          "Price": "Çmimi",
+      
+          "Clearfilters": "Pastro filtrat",
+          "FindYourNextDeal": "Gjeni ofertën tuaj të radhës",
+          "HeroSubtitle": "Makina, shtëpi, elektronikë dhe më shumë — gjithçka në një vend",
+          "SearchListings": "Kërko shpallje...",
+          "MinPrice": "Çmimi minimal",
+          "MaxPrice": "Çmimi maksimal",
+          "City": "Qyteti",
+          "Region": "Rajoni",
+      
+          "LoadingListings": "Duke u ngarkuar shpalljet",
+          "FailedToLoadListings": "Ngarkimi i shpalljeve dështoi",
+          "results": "rezultate",
+      
+          "Prev": "Para",
+          "Page": "Faqe",
+          "Next": "Pas",
+      
+          "MyListings": "Shpalljet e mia",
+          "NewListings": "Shpallje të reja",
+          "Status": "Statusi",
+          "NoListingsYet": "Ende nuk ka shpallje",
+      
+          "Edit": "Ndrysho",
+          "Delete": "Fshij",
+          "Publish": "Publiko",
+      
+          "MyFavorites": "Të preferuarat e mia",
+          "LoadingFavorites": "Duke u ngarkuar të preferuarat",
+      
+          "Listing": "Shpallje",
+      
+          "Login": "Hyrje",
+          "Register": "Regjistrohu",
+          "Logout": "Dil",
+      
+          "Inbox": "Mesazhe",
+          "Favorites": "Të preferuarat",
+      
+          "Password": "Fjalëkalimi",
+          "Email": "Email",
+         "Title": "Titulli",
+          "CreateAccount": "Krijo llogari",
+        "SelectCategory": "Zgjidh kategorinë"
+
+      }
+      
+      
+      
+      
+      
+      
+  }
+  

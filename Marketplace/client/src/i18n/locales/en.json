@@ -1,0 +1,92 @@
+{
+    "search": "Search",
+    "price": "Price",
+    "city": "City",
+    "condition": "Condition",
+    "new": "New",
+    "used": "Used",
+    "editListing": "Edit listing",
+  
+    "common": {
+      "loading": "Loading",
+      "NotFound": "Not found",
+      "SelectCategory": "Select Category",
+      "ContinueToImages": "Continue to images",
+      "ContinueToReview": "Continue to review",
+      "SaveListing": "Save listing",
+  
+      "Images": "Images",
+      "Review": "Review",
+      "SetCover": "Set cover",
+  
+      "FEATURED": "FEATURED",
+      "URGENT": "URGENT",
+  
+      "Description": "Description",
+      "ContactSeller": "Contact seller",
+      "Views": "Views",
+      "Seller": "Seller",
+      "ViewSellerListings": "View seller listings",
+  
+      "NoImagesYet": "No images yet",
+      "CoverImage": "Cover image",
+      "SetAsCover": "Set as cover",
+  
+      "Search": "Search",
+      "Filters": "Filters",
+      "Category": "Category",
+      "IncludeSubcategories": "Include subcategories",
+      "AnyCondition": "Any condition",
+      "Used": "Used",
+      "New": "New",
+      "Newest": "Newest",
+      "Price": "Price",
+  
+      "Clearfilters": "Clear filters",
+  
+      "FindYourNextDeal": "Find your next deal",
+      "HeroSubtitle": "Cars, homes, electronics & more — all in one place",
+      "SearchListings": "Search listings...",
+      "MinPrice": "Min price",
+      "MaxPrice": "Max price",
+      "City": "City",
+      "Region": "Region",
+  
+      "LoadingListings": "Loading listings",
+      "FailedToLoadListings": "Failed to load listings",
+      "results": "results",
+  
+      "Prev": "Prev",
+      "Page": "Page",
+      "Next": "Next",
+  
+      "MyListings": "My listings",
+      "NewListings": "New listings",
+      "Status": "Status",
+      "NoListingsYet": "No listings yet",
+  
+      "Edit": "Edit",
+      "Delete": "Delete",
+      "Publish": "Publish",
+  
+      "MyFavorites": "My favorites",
+      "LoadingFavorites": "Loading favorites",
+  
+      "Listing": "Listing",
+  
+      "Login": "Login",
+      "Register": "Register",
+      "Logout": "Logout",
+  
+      "Inbox": "Inbox",
+      "Favorites": "Favorites",
+  
+      "Password": "Password",
+      "Email": "Email",
+      "Title": "Title",
+      "Grid": "Grid",
+    "List": "List",
+      "CreateAccount": "Create account"
+    }
+  }
+  

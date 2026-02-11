@@ -1,0 +1,94 @@
+{
+    "search": "Пребарај",
+    "price": "Цена",
+    "city": "Град",
+    "condition": "Состојба",
+    "new": "Ново",
+    "used": "Користено",
+    "editListing": "Уреди оглас",
+    
+    
+      "common": {
+        "loading": "Се вчитува",
+        "NotFound": "Не е пронајдено",
+        "SelectCategory": "Изберете категорија",
+    
+        "ContinueToImages": "Продолжи кон слики",
+        "ContinueToReview": "Продолжи кон преглед",
+        "SaveListing": "Зачувај оглас",
+    
+        "Images": "Слики",
+        "Review": "Преглед",
+        "SetCover": "Постави насловна",
+    
+        "FEATURED": "ИЗДВОЕНО",
+        "URGENT": "ИТНО",
+    
+        "Description": "Опис",
+        "ContactSeller": "Контактирај продавач",
+        "Views": "Прегледи",
+        "Seller": "Продавач",
+        "ViewSellerListings": "Види огласи од продавачот",
+    
+        "NoImagesYet": "Сè уште нема слики",
+        "CoverImage": "Насловна слика",
+        "SetAsCover": "Постави како насловна",
+    
+        "Search": "Пребарај",
+        "Filters": "Филтри",
+        "Category": "Категорија",
+        "IncludeSubcategories": "Вклучи подкатегории",
+        "AnyCondition": "Секоја состојба",
+        "Used": "Користено",
+        "New": "Ново",
+        "Newest": "Најново",
+        "Price": "Цена",
+    
+        "Clearfilters": "Исчисти филтри",
+        "FindYourNextDeal": "Пронајдете ја вашата следна зделка",
+        "HeroSubtitle": "Автомобили, домови, електроника и повеќе — сè на едно место",
+        "SearchListings": "Пребарај огласи...",
+        "MinPrice": "Минимална цена",
+        "MaxPrice": "Максимална цена",
+        "City": "Град",
+        "Region": "Регион",
+    
+        "LoadingListings": "Се вчитуваат огласите",
+        "FailedToLoadListings": "Неуспешно вчитување на огласите",
+        "results": "резултати",
+    
+        "Prev": "Претходна",
+        "Page": "Страница",
+        "Next": "Следна",
+    
+        "MyListings": "Мои огласи",
+        "NewListings": "Нови огласи",
+        "Status": "Статус",
+        "NoListingsYet": "Сè уште нема огласи",
+    
+        "Edit": "Измени",
+        "Delete": "Избриши",
+        "Publish": "Објави",
+    
+        "MyFavorites": "Мои омилени",
+        "LoadingFavorites": "Се вчитуваат омилени",
+    
+        "Listing": "Оглас",
+    
+        "Login": "Најава",
+        "Register": "Регистрација",
+        "Logout": "Одјава",
+    
+        "Inbox": "Сандаче",
+        "Favorites": "Омилени",
+    
+        "Password": "Лозинка",
+        "Email": "Е-пошта",
+        "Title": "Наслов",
+    
+        "CreateAccount": "Креирај сметка"
+      }
+    
+    
+  }
+  

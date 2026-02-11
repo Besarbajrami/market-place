@@ -1,0 +1,70 @@
+@import "./theme.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-main);
+  background: var(--background);
+  color: #111;
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Typography */
+h1 { font-size: 28px; margin: 0 0 12px; }
+h2 { font-size: 22px; margin: 0 0 10px; }
+h3 { font-size: 18px; margin: 0 0 8px; }
+
+p {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* Buttons reset */
+button {
+  font-family: inherit;
+}
+/* Responsive helpers */
+.mobile-only {
+    display: none;
+  }
+  
+  .desktop-nav {
+    display: flex;
+  }
+  
+  /* Mobile breakpoint */
+  @media (max-width: 768px) {
+    .desktop-nav {
+      display: none;
+    }
+  
+    .mobile-only {
+      display: block;
+    }
+  }
+  /* Listing details layout */
+.listing-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+  }
+  
+  /* Mobile */
+  @media (max-width: 768px) {
+    .listing-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
