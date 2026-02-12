@@ -4,6 +4,9 @@ import { useMessages, useSendMessage } from "./useChat";
 import { useAuth } from "../../auth/useAuth";
 import { useConversationHeader } from "./useChat";
 import { useNavigate } from "react-router-dom";
+import { createChatConnection } from "./chatHub";
+import * as signalR from "@microsoft/signalr";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function ConversationPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +18,68 @@ export function ConversationPage() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const header = useConversationHeader(conversationId);
   const nav = useNavigate();
-  
+  const qc = useQueryClient();
+
+  // ✅ SignalR realtime handling
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const connection = createChatConnection();
+    let isMounted = true;
+
+    async function start() {
+      try {
+        if (connection.state === signalR.HubConnectionState.Disconnected) {
+          await connection.start();
+        }
+
+        if (!isMounted) return;
+
+        await connection.invoke("JoinConversation", conversationId);
+
+        // Remove previous handler (important to avoid duplicates)
+        connection.off("message:new");
+
+        connection.on("message:new", (message) => {
+          qc.setQueryData(
+            ["conversation-messages", conversationId, 50],
+            (old: any) => {
+              if (!old || !old.items) {
+                return { items: [message] };
+              }
+
+              // Prevent duplicate if already added optimistically
+              if (old.items.some((m: any) => m.id === message.id)) {
+                return old;
+              }
+
+              return {
+                ...old,
+                items: [...old.items, message],
+              };
+            }
+          );
+        });
+      } catch (err) {
+        console.error("SignalR connection error:", err);
+      }
+    }
+
+    start();
+
+    return () => {
+      isMounted = false;
+
+      connection.off("message:new");
+
+      if (connection.state === signalR.HubConnectionState.Connected) {
+        connection.invoke("LeaveConversation", conversationId)
+          .catch(() => {});
+      }
+    };
+  }, [conversationId, qc]);
+
+  // ✅ Auto scroll
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -32,48 +96,48 @@ export function ConversationPage() {
     setText("");
   }
 
-  const myUserId = user?.id; // adjust based on your auth user shape
+  const myUserId = user?.id;
 
   return (
-    <div style={{}}>
-        {header.data && (
-  <div
-    onClick={() => nav(`/listings/${header.data.listingId}`)}
-    style={{
-      display: "flex",
-      gap: 12,
-      alignItems: "center",
-      padding: 12,
-      border: "1px solid #ddd",
-      borderRadius: 8,
-      marginBottom: 12,
-      cursor: "pointer",
-      background: "#fafafa"
-    }}
-  >
-    {header.data.coverImageUrl && (
-      <img
-        src={header.data.coverImageUrl}
-        alt={header.data.listingTitle}
-        style={{
-          width: 80,
-          height: 60,
-          objectFit: "cover",
-          borderRadius: 6
-        }}
-      />
-    )}
+    <div>
+      {header.data && (
+        <div
+          onClick={() => nav(`/listings/${header.data.listingId}`)}
+          style={{
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+            padding: 12,
+            border: "1px solid #ddd",
+            borderRadius: 8,
+            marginBottom: 12,
+            cursor: "pointer",
+            background: "#fafafa"
+          }}
+        >
+          {header.data.coverImageUrl && (
+            <img
+              src={header.data.coverImageUrl}
+              alt={header.data.listingTitle}
+              style={{
+                width: 80,
+                height: 60,
+                objectFit: "cover",
+                borderRadius: 6
+              }}
+            />
+          )}
 
-    <div style={{ flex: 1 }}>
-      <div style={{ fontWeight: 600 }}>
-        {header.data.listingTitle}
-      </div>
-      <div style={{ fontSize: 14, opacity: 0.8 }}>
-        {header.data.price} {header.data.currency}
-      </div>
-    </div>
-  </div>
-)}
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 600 }}>
+              {header.data.listingTitle}
+            </div>
+            <div style={{ fontSize: 14, opacity: 0.8 }}>
+              {header.data.price} {header.data.currency}
+            </div>
+          </div>
+        </div>
+      )}
 
       <h1>Conversation</h1>
 
