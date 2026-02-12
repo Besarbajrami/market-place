@@ -71,7 +71,8 @@ export function QuickCreateListingPage() {
           city: "",
           region: "",
           condition: "used",
-          attributes: [] // ✅ REQUIRED by backend contract
+ countryCode: "MK",         
+ attributes: [] // ✅ REQUIRED by backend contract
         }
       });
 
