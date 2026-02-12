@@ -7,7 +7,7 @@ import { Container } from "../../shared/ui/Container";
 import { Card } from "../../shared/ui/Card";
 import { Badge } from "../../shared/ui/Badge";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+
 export function ListingDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useListingDetails(id ?? "");
@@ -21,19 +21,19 @@ export function ListingDetailsPage() {
   if (isLoading) return <div>Loading listing...</div>;
   if (isError || !data) return <div>Listing not found.</div>;
   const API_BASE_URL = import.meta.env.VITE_API_URL ?? "https://localhost:7012";
-  const isOwner =
-  isAuthenticated && user?.id === data.sellerId;
-  const coverImage =
-  data.images && data.images.length > 0
-    ? data.images.find(i => i.isCover) ?? data.images[0]
-    : undefined;
 
-const imageUrl =
-  coverImage?.url
-    ? coverImage.url.startsWith("http")
-      ? coverImage.url
-      : `${API_BASE_URL}${coverImage.url}`
-    : "/images/placeholder.png";
+  const coverImage =
+    data.images && data.images.length > 0
+      ? data.images.find(i => i.isCover) ?? data.images[0]
+      : undefined;
+      const isOwner =
+      isAuthenticated && user?.id === data.sellerId;
+  const imageUrl =
+    coverImage?.url
+      ? coverImage.url.startsWith("http")
+        ? coverImage.url
+        : `${API_BASE_URL}${coverImage.url}`
+      : "/images/placeholder.png";
   function toggleFavorite() {
     if (!data) return;
 
