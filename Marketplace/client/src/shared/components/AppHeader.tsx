@@ -22,6 +22,7 @@ export function AppHeader() {
       {/* TOP BAR */}
       <div
         style={{
+          width: "100%",
           maxWidth: 1100,
           margin: "0 auto",
           padding: "12px 16px",

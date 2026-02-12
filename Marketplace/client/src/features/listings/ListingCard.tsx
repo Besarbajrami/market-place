@@ -1,11 +1,8 @@
 import { slugify } from "../../shared/slug";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  useAddFavorite,
-  useRemoveFavorite
-} from "../favorites/useFavorite";
-import { useState } from "react";
+import { useAddFavorite, useRemoveFavorite } from "../favorites/useFavorite";
+import { useMemo, useState, useEffect } from "react";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ?? "https://localhost:7012";
@@ -35,20 +32,23 @@ export function ListingCard({ listing }: Props) {
   const addFavorite = useAddFavorite();
   const removeFavorite = useRemoveFavorite();
 
-  /* ---------------------------------- */
-  /* ✅ LOCAL optimistic state           */
-  /* ---------------------------------- */
-  const [isFavorite, setIsFavorite] = useState(
-    !!listing.isFavorite
-  );
+  /* ✅ LOCAL optimistic state */
+  const [isFavorite, setIsFavorite] = useState(!!listing.isFavorite);
+
+  // ✅ NEW: mobile detection (safe for Vite SPA)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth <= 640);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const isFeatured =
-    listing.featuredUntil &&
-    new Date(listing.featuredUntil) > new Date();
+    listing.featuredUntil && new Date(listing.featuredUntil) > new Date();
 
   const isUrgent =
-    listing.urgentUntil &&
-    new Date(listing.urgentUntil) > new Date();
+    listing.urgentUntil && new Date(listing.urgentUntil) > new Date();
 
   const imageUrl = listing.coverImageUrl
     ? listing.coverImageUrl.startsWith("http")
@@ -56,48 +56,57 @@ export function ListingCard({ listing }: Props) {
       : `${API_BASE_URL}${listing.coverImageUrl}`
     : "/images/placeholder.png";
 
-  return (
-    <div
-      onClick={() =>
-        nav(`/listings/${listing.id}/${slugify(listing.title)}`)
-      }
-      style={{
+    const containerStyle = useMemo<React.CSSProperties>(
+      () => ({
         cursor: "pointer",
         display: "grid",
-        gridTemplateColumns: "140px 1fr",
-        gap: 14,
+        gridTemplateColumns: isMobile ? "1fr" : "140px 1fr",
+        gap: isMobile ? 10 : 14,
         background: "var(--surface)",
         border: "1px solid var(--border)",
         borderRadius: 14,
         overflow: "hidden",
         boxShadow: "var(--shadow)",
-        position: "relative"
-      }}
+        position: "relative",
+      }),
+      [isMobile]
+    );
+  const imageStyle = useMemo(
+    () => ({
+      width: isMobile ? "100%" : 140,
+      height: isMobile ? 180 : 110,
+      backgroundColor: "#f2f2f2",
+      backgroundImage: `url(${imageUrl})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center"
+    }),
+    [isMobile, imageUrl]
+  );
+
+  const contentStyle = useMemo(
+    () => ({
+      padding: isMobile ? "12px" : "10px 10px 10px 0"
+    }),
+    [isMobile]
+  );
+
+  return (
+    <div
+    
+      onClick={() => nav(`/listings/${listing.id}/${slugify(listing.title)}`)}
+      style={containerStyle}
     >
       {/* IMAGE */}
-      <div
-        style={{
-          width: 140,
-          height: 110,
-          backgroundColor: "#f2f2f2",
-          backgroundImage: `url(${imageUrl})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center"
-        }}
-      />
+      <div style={imageStyle} />
 
       {/* CONTENT */}
-      <div style={{ padding: "10px 10px 10px 0" }}>
-        <div style={{ fontWeight: 800, fontSize: 15 }}>
+      <div style={contentStyle}>
+        <div style={{ fontWeight: 800,fontSize: isMobile ? 14 : 15 }}>
           {listing.title}
         </div>
 
         <div style={{ marginTop: 4, fontSize: 12, color: "var(--muted)" }}>
-          {listing.categoryName && (
-            <>
-              {listing.categoryName} ·{" "}
-            </>
-          )}
+          {listing.categoryName && <>{listing.categoryName} · </>}
           {listing.publishedAt &&
             new Date(listing.publishedAt).toLocaleDateString()}
         </div>
@@ -107,7 +116,7 @@ export function ListingCard({ listing }: Props) {
           {listing.region && ` · ${listing.region}`}
         </div>
 
-        <div style={{ marginTop: 10, fontSize: 18, fontWeight: 900 }}>
+        <div style={{ marginTop: 10, fontSize: isMobile ? 16 : 18, fontWeight: 900 }}>
           {listing.price} {listing.currency}
         </div>
       </div>

@@ -51,10 +51,10 @@ export function EditListingPage() {
   /* ---------------- Form state ---------------- */
   const [country, setCountry] = useState("MK"); // default Macedonia
   // region you already have
-  
+
   const { data: countries = [] } = useCountries();
   const { data: cities = [] } = useCities(country || null);
-  
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -69,6 +69,9 @@ export function EditListingPage() {
 
   const { data: categoryAttributes = [] } =
     useCategoryAttributes(categoryId || null);
+
+  // ✅ NEW: form-level error message from backend
+  const [formError, setFormError] = useState<string | null>(null);
 
   /* ---------------- Init sync ---------------- */
 
@@ -91,6 +94,9 @@ export function EditListingPage() {
       map[a.categoryAttributeId] = a.value;
     });
     setAttributeValues(map);
+
+    // ✅ clear old error on load
+    setFormError(null);
   }, [editData]);
 
   useEffect(() => {
@@ -108,29 +114,54 @@ export function EditListingPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError(null);
 
-    await update.mutateAsync({
-      id: listingId,
-      payload: {
-        categoryId,
-        title,
-        description,
-        price: Number(price) || 0,
-        currency,
-        countryCode: country, 
-        city,
-        region,
-        condition,
-        attributes: Object.entries(attributeValues).map(
-          ([categoryAttributeId, value]) => ({
-            categoryAttributeId,
-            value
-          })
-        )
-      }
-    });
+    try {
+      await update.mutateAsync({
+        id: listingId,
+        payload: {
+          categoryId,
+          title,
+          description,
+          price: Number(price) || 0,
+          currency,
+          countryCode: country,
+          city,
+          region,
+          condition,
+          attributes: Object.entries(attributeValues).map(
+            ([categoryAttributeId, value]) => ({
+              categoryAttributeId,
+              value
+            })
+          )
+        }
+      });
 
-    navigate("/me/listings");
+      navigate("/me/listings");
+    } catch (err: any) {
+      // ✅ Handles common backend formats:
+      // { message }, { error }, { errors: {...} }, axios Error.message
+      const serverMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.data?.title || // sometimes validation responses use "title"
+        err?.message;
+
+      // If backend returns validation dictionary, show first error
+      const dict = err?.response?.data?.errors;
+      const firstDictError =
+        dict && typeof dict === "object"
+          ? Object.values(dict)?.flat?.()?.[0]
+          : null;
+
+      setFormError(
+        firstDictError ||
+          serverMessage ||
+          (t("common.SomethingWentWrong") as any) ||
+          "Something went wrong"
+      );
+    }
   }
 
   function onFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
@@ -149,6 +180,14 @@ export function EditListingPage() {
               isCover: i.isCover
             }))
           ]);
+        },
+        onError: (err: any) => {
+          const msg =
+            err?.response?.data?.message ||
+            err?.response?.data?.error ||
+            err?.message ||
+            "Upload failed";
+          setFormError(msg);
         }
       }
     );
@@ -167,7 +206,13 @@ export function EditListingPage() {
   /* ---------------------------------- */
 
   return (
-    <div style={{ margin: "40px auto", padding: 16  }}>
+    <div
+      style={{
+        margin: "20px auto",
+        padding: 16,
+        maxWidth: 760
+      }}
+    >
       <h1>{t("common.Edit") || "Edit listing"}</h1>
 
       <form onSubmit={onSubmit}>
@@ -187,78 +232,104 @@ export function EditListingPage() {
               placeholder={t("common.Title") || "Title"}
               value={title}
               onChange={e => setTitle(e.target.value)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 10,
+                border: "1px solid var(--border)",
+                width: "100%"
+              }}
             />
 
             <textarea
               placeholder={t("common.Description") || "Description"}
               value={description}
               onChange={e => setDescription(e.target.value)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 10,
+                border: "1px solid var(--border)",
+                width: "100%",
+                minHeight: 110
+              }}
             />
           </Section>
 
           {/* PRICE & LOCATION */}
           <Section title={t("") || ""}>
-            <div style={{ display: "flex", gap: 12 }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <input
                 type="number"
                 placeholder={t("common.Price") || "Price"}
                 value={price}
                 onChange={e => setPrice(e.target.value)}
+                style={{
+                  flex: 1,
+                  minWidth: 160,
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)"
+                }}
               />
 
-<select
-  value={currency}
-  onChange={e => setCurrency(e.target.value)}
->
-  <option value="EUR">EUR</option>
-  <option value="MKD">MKD</option>
-</select>
-
+              <select
+                value={currency}
+                onChange={e => setCurrency(e.target.value)}
+                style={{
+                  minWidth: 120,
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)"
+                }}
+              >
+                <option value="EUR">EUR</option>
+                <option value="MKD">MKD</option>
+              </select>
             </div>
 
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-  {/* COUNTRY */}
-  <select
-    value={country}
-    onChange={e => {
-      setCountry(e.target.value);
-      setCity(""); // reset city when country changes
-    }}
-    style={{
-      flex: "0 0 140px",
-      padding: "10px 12px",
-      borderRadius: 10,
-      border: "1px solid var(--border)",
-      display:"none"
-    }}
-  >
-    {countries.map(c => (
-      <option key={c.code} value={c.code}>
-        {c.name}
-      </option>
-    ))}
-  </select>
+              {/* COUNTRY */}
+              <select
+                value={country}
+                onChange={e => {
+                  setCountry(e.target.value);
+                  setCity(""); // reset city when country changes
+                }}
+                style={{
+                  flex: "0 0 140px",
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  display: "none"
+                }}
+              >
+                {countries.map(c => (
+                  <option key={c.code} value={c.code}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
 
-  {/* CITY */}
-  <select
-    value={city}
-    onChange={e => setCity(e.target.value)}
-    style={{
-      flex: 1,
-      minWidth: 140,
-      padding: "10px 12px",
-      borderRadius: 10,
-      border: "1px solid var(--border)"
-    }}
-  >
-    <option value="">{t("common.City") || "Select city"}</option>
-    {cities.map(c => (
-      <option key={c.id} value={c.name}>
-        {c.name}
-      </option>
-    ))}
-  </select>
-
+              {/* CITY */}
+              <select
+                value={city}
+                onChange={e => setCity(e.target.value)}
+                style={{
+                  flex: 1,
+                  minWidth: 200,
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)"
+                }}
+              >
+                <option value="">
+                  {t("common.City") || "Select city"}
+                </option>
+                {cities.map(c => (
+                  <option key={c.id} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
 
               {/* <input
                 placeholder={t("common.Region") || "Region"}
@@ -286,6 +357,9 @@ export function EditListingPage() {
               multiple
               accept="image/*"
               onChange={onFilesSelected}
+              style={{
+                padding: "10px 0"
+              }}
             />
 
             <ListingImagesEditor
@@ -296,9 +370,27 @@ export function EditListingPage() {
             />
           </Section>
 
+          {/* ✅ NEW: Error box (keeps everything else) */}
+          {formError && (
+            <div
+              style={{
+                background: "#fdecea",
+                color: "#b71c1c",
+                padding: 12,
+                borderRadius: 10,
+                fontSize: 14,
+                marginTop: 12
+              }}
+            >
+              {formError}
+            </div>
+          )}
+
           {/* SAVE */}
-          <PrimaryButton type="submit" disabled={!canSubmit}>
-            {t("common.Save") || "Save listing"}
+          <PrimaryButton type="submit" disabled={!canSubmit || update.isPending}>
+            {update.isPending
+              ? t("common.Saving") || "Saving..."
+              : t("common.Save") || "Save listing"}
           </PrimaryButton>
         </Card>
       </form>
@@ -352,7 +444,8 @@ function PrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
         background: "#1976d2",
         color: "white",
         fontWeight: 700,
-        opacity: props.disabled ? 0.5 : 1
+        opacity: props.disabled ? 0.5 : 1,
+        width: "100%"
       }}
     />
   );

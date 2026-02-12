@@ -20,6 +20,21 @@ body{
 .mt-3{
   margin-top: 10px;
 }
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);

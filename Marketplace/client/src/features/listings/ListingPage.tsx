@@ -361,9 +361,9 @@ export function ListingsPage() {
                 display: "grid",
                 gap: 12,
                 gridTemplateColumns:
-                  view === "grid"
-                    ? "repeat(auto-fill, minmax(360px, 1fr))"
-                    : "1fr"
+                view === "grid"
+                  ? "repeat(auto-fill, minmax(260px, 1fr))"
+                  : "1fr"
               }}
             >
               {items.map(item => (

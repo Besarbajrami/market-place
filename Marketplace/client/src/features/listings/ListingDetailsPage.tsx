@@ -7,7 +7,7 @@ import { Container } from "../../shared/ui/Container";
 import { Card } from "../../shared/ui/Card";
 import { Badge } from "../../shared/ui/Badge";
 import { useTranslation } from "react-i18next";
-
+import { useState } from "react";
 export function ListingDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useListingDetails(id ?? "");
@@ -21,19 +21,37 @@ export function ListingDetailsPage() {
   if (isLoading) return <div>Loading listing...</div>;
   if (isError || !data) return <div>Listing not found.</div>;
   const API_BASE_URL = import.meta.env.VITE_API_URL ?? "https://localhost:7012";
+  const isOwner =
+  isAuthenticated && user?.id === data.sellerId;
+  const images = data.images ?? [];
 
-  const coverImage =
-    data.images && data.images.length > 0
-      ? data.images.find(i => i.isCover) ?? data.images[0]
-      : undefined;
-      const isOwner =
-      isAuthenticated && user?.id === data.sellerId;
+  const initialIndex =
+    images.findIndex(i => i.isCover) >= 0
+      ? images.findIndex(i => i.isCover)
+      : 0;
+  
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  
+  const currentImage = images[currentIndex];
+  
   const imageUrl =
-    coverImage?.url
-      ? coverImage.url.startsWith("http")
-        ? coverImage.url
-        : `${API_BASE_URL}${coverImage.url}`
+    currentImage?.url
+      ? currentImage.url.startsWith("http")
+        ? currentImage.url
+        : `${API_BASE_URL}${currentImage.url}`
       : "/images/placeholder.png";
+  
+  function nextImage() {
+    if (images.length <= 1) return;
+    setCurrentIndex(i => (i + 1) % images.length);
+  }
+  
+  function prevImage() {
+    if (images.length <= 1) return;
+    setCurrentIndex(i =>
+      i === 0 ? images.length - 1 : i - 1
+    );
+  }
   function toggleFavorite() {
     if (!data) return;
 
@@ -71,19 +89,75 @@ export function ListingDetailsPage() {
   return (
     <Container>
       {/* COVER IMAGE */}
-      {coverImage && (
-        <img
-          src={imageUrl}
-          alt={data.title}
+      {images.length > 0 && (
+  <div style={{ position: "relative" }}>
+    <img
+      src={imageUrl}
+      alt={data.title}
+      style={{
+        width: "100%",
+        maxHeight: 500,
+        objectFit: "contain",
+        borderRadius: 12,
+        marginBottom: 16,
+        background: "#f3f4f6"
+      }}
+    />
+
+    {images.length > 1 && (
+      <>
+        {/* LEFT */}
+        <button
+          onClick={prevImage}
           style={{
-            width: "100%",
-            height: 260,
-            objectFit: "cover",
-            borderRadius: 12,
-            marginBottom: 16
+            position: "absolute",
+            top: "50%",
+            transform: "translateY(-50%)",
+            background: "rgba(0,0,0,0.6)",
+            color: "white",
+            border: "none",
+            borderRadius: "50%",
+            width: 42,
+            height: 42,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 22,
+            cursor: "pointer",
+            padding: 0
           }}
-        />
-      )}
+        >
+          ‹
+        </button>
+
+        {/* RIGHT */}
+        <button
+          onClick={nextImage}
+          style={{
+            position: "absolute",
+            top: "50%",
+            right: 10,
+            transform: "translateY(-50%)",
+            background: "rgba(0,0,0,0.5)",
+            color: "white",
+            border: "none",
+            borderRadius: "50%",
+            width: 42,
+            height: 42,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 22,
+            cursor: "pointer",
+            padding: 0
+          }}
+        >
+          ›
+        </button>
+      </>
+    )}
+  </div>
+)}
 
       {/* TITLE + SAVE */}
       <div
@@ -137,26 +211,29 @@ export function ListingDetailsPage() {
                   gap: 8
                 }}
               >
-                {data.images.map(img => (
+             {images.map((img, index) => (
                   
                   <img
-                    key={img.id}
-                    src={
-                      img.url.startsWith("http")
-                        ? img.url
-                        : `${API_BASE_URL}${img.url}`
-                    }
-                    alt=""
-                    style={{
-                      width: "100%",
-                      height: 80,
-                      objectFit: "cover",
-                      borderRadius: 6,
-                      border: img.isCover
+                  key={img.id}
+                  onClick={() => setCurrentIndex(index)}
+                  src={
+                    img.url.startsWith("http")
+                      ? img.url
+                      : `${API_BASE_URL}${img.url}`
+                  }
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: 80,
+                    objectFit: "cover",
+                    borderRadius: 6,
+                    cursor: "pointer",
+                    border:
+                      index === currentIndex
                         ? "2px solid var(--primary)"
                         : "1px solid var(--border)"
-                    }}
-                  />
+                  }}
+                />
                 ))}
               </div>
             </Card>
