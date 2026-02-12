@@ -10,7 +10,7 @@ import { Card } from "../../shared/ui/Card";
 import { useTranslation } from "react-i18next";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL ?? "https://localhost:7012";
+  import.meta.env.VITE_API_URL;
 
 export function MyListingsPage() {
   const nav = useNavigate();

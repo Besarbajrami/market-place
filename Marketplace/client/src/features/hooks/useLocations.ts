@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "https://localhost:7012";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export type CountryDto = { code: string; name: string };
 export type CityDto = { id: string; name: string; countryCode: string };

@@ -6,7 +6,7 @@ import { Container } from "../../shared/ui/Container";
 import { Card } from "../../shared/ui/Card";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL ?? "https://localhost:7012";
+  import.meta.env.VITE_API_URL ;
 
 export function SellerPage() {
   const { sellerId } = useParams<{ sellerId: string }>();

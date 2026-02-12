@@ -20,7 +20,7 @@ export function ListingDetailsPage() {
 
   if (isLoading) return <div>Loading listing...</div>;
   if (isError || !data) return <div>Listing not found.</div>;
-  const API_BASE_URL = import.meta.env.VITE_API_URL ?? "https://localhost:7012";
+  const API_BASE_URL = import.meta.env.VITE_API_URL ;
   const isOwner =
   isAuthenticated && user?.id === data.sellerId;
   const images = data.images ?? [];

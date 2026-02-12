@@ -5,7 +5,7 @@ import { useAddFavorite, useRemoveFavorite } from "../favorites/useFavorite";
 import { useMemo, useState, useEffect } from "react";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL ?? "https://localhost:7012";
+  import.meta.env.VITE_API_URL ;
 
 interface Props {
   listing: {
