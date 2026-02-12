@@ -210,10 +210,19 @@ var app = builder.Build();
 // --------------------------------------------------
 // DATABASE / IDENTITY SEEDING
 // --------------------------------------------------
+// --------------------------------------------------
+// DATABASE / IDENTITY SEEDING
+// --------------------------------------------------
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
+    var db = services.GetRequiredService<MarketplaceDbContext>();
+
+    // ✅ ALWAYS migrate FIRST
+    await db.Database.MigrateAsync();
+
+    // ✅ THEN seed Identity
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     await IdentitySeeder.SeedRolesAsync(roleManager);
 
@@ -221,11 +230,14 @@ using (var scope = app.Services.CreateScope())
     var config = services.GetRequiredService<IConfiguration>();
     await IdentitySeeder.SeedAdminAsync(userManager, config);
 
-    var db = services.GetRequiredService<MarketplaceDbContext>();
-    await db.Database.MigrateAsync();
+    // ✅ THEN seed domain data
     await CategorySeeder.SeedAsync(db);
 }
 
+
+// --------------------------------------------------
+// PIPELINE (ORDER MATTERS)
+// --------------------------------------------------
 // --------------------------------------------------
 // PIPELINE (ORDER MATTERS)
 // --------------------------------------------------
@@ -236,16 +248,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("client");
 
-app.UseRouting();             
-
-app.UseAuthentication();         
-app.UseAuthorization();
-app.UseMiddleware<ExceptionMiddleware>();
-
-app.MapHub<Marketplace.Api.Hubs.ChatHub>("/hubs/chat");
-
+// Localization early
 app.UseRequestLocalization(
     app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
+
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Append("Vary", "Accept-Language");
@@ -254,8 +260,25 @@ app.Use(async (context, next) =>
 
 app.UseHttpsRedirection();
 app.UseRateLimiter();
-app.UseStaticFiles();
 
+// ✅ STATIC FILES MUST COME BEFORE ROUTING
+app.UseDefaultFiles();   // maps "/" → index.html
+app.UseStaticFiles();    // serves wwwroot
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseMiddleware<ExceptionMiddleware>();
+
+app.MapHub<Marketplace.Api.Hubs.ChatHub>("/hubs/chat");
+
+// API routes
 app.MapControllers();
 
+// ✅ SPA fallback (client-side routing)
+app.MapFallbackToFile("index.html");
+
 app.Run();
+

@@ -1,0 +1,30 @@
+services:
+  marketplace-api:
+    build:
+      context: .
+      dockerfile: src/Marketplace.Api/Dockerfile
+    container_name: marketplace-api
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ConnectionStrings__DefaultConnection: "Host=marketplace-db;Port=5432;Database=marketplace;Username=postgres;Password=postgres!"
+    ports:
+      - "7101:8080"
+    depends_on:
+      - marketplace-db
+
+  marketplace-db:
+    image: postgres:15
+    container_name: marketplace-db
+    restart: always
+    environment:
+      POSTGRES_DB: marketplace
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres!
+    volumes:
+      - marketplace_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+volumes:
+  marketplace_pgdata:
