@@ -60,14 +60,12 @@ public sealed class SearchListingsV2QueryHandler
 
         var (rows, total) = await _listings.SearchPublishedAsync(spec, ct);
 
-        // ✅ LOAD FAVORITES ONCE
         HashSet<Guid> favoriteIds = new();
         if (request.ViewerId.HasValue)
         {
             favoriteIds = (await _favorites.GetListingIdsForUserAsync(
-      request.ViewerId.Value,
-      ct)).ToHashSet();
-
+                request.ViewerId.Value,
+                ct)).ToHashSet();
         }
 
         var categoryIdsDistinct = rows
@@ -90,20 +88,23 @@ public sealed class SearchListingsV2QueryHandler
                 : new CategoryLabelDto(r.CategoryId, r.CategoryId.ToString(), "");
 
             items.Add(new ListingSearchItem(
-                r.Id,
-                r.Title,
-                r.Price,
-                r.Currency,
-                r.City,
-                r.Region,
-                r.PublishedAt,
-                r.CoverImageUrl,
-                r.FeaturedUntil is not null && r.FeaturedUntil > now,
-                r.UrgentUntil is not null && r.UrgentUntil > now,
-                category,
-                request.ViewerId.HasValue && favoriteIds.Contains(r.Id),
-                r.CountryCode
-            ));
+          r.Id,
+          r.Title,
+          r.Price,
+          r.Currency,
+          r.City,
+          r.Region,
+          r.PublishedAt,
+          r.CoverImageUrl,
+          r.Images
+              .Select(i => new ListingImagePreviewDto(i.Id, i.Url))
+              .ToList(),
+          r.FeaturedUntil is not null && r.FeaturedUntil > now,
+          r.UrgentUntil is not null && r.UrgentUntil > now,
+          category,
+          request.ViewerId.HasValue && favoriteIds.Contains(r.Id),
+          r.CountryCode
+      ));
         }
 
         return Result<SearchListingsV2Response>.Success(

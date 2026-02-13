@@ -137,28 +137,41 @@ public sealed class ListingRepository : IListingRepository
         // Project with cover image
         // cover = first where IsCover or lowest SortOrder
         var items = await q
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(l => new ListingSearchRow(
-                l.Id,
-                l.Title,
-                l.Price ?? 0,
-                l.Currency,
-                l.LocationCity,
-                l.LocationRegion,
-                l.PublishedAt ?? DateTime.UtcNow,
-                l.CategoryId,
-                _db.ListingImages
-                    .Where(i => i.ListingId == l.Id)
-                    .OrderByDescending(i => i.IsCover)
-                    .ThenBy(i => i.SortOrder)
-                    .Select(i => i.Url)
-                    .FirstOrDefault(),
-                l.FeaturedUntil,
-l.UrgentUntil,
-l.LocationCountryCode
-            ))
-            .ToListAsync(ct);
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(l => new ListingSearchRow(
+            l.Id,
+            l.Title,
+            l.Price ?? 0,
+            l.Currency,
+            l.LocationCity,
+            l.LocationRegion,
+            l.PublishedAt ?? DateTime.UtcNow,
+            l.CategoryId,
+            _db.ListingImages
+                .Where(i => i.ListingId == l.Id)
+                .OrderByDescending(i => i.IsCover)
+                .ThenBy(i => i.SortOrder)
+                .Select(i => i.Url)
+                .FirstOrDefault(),
+
+            // ✅ LOAD TOP 3 IMAGES
+            _db.ListingImages
+                .Where(i => i.ListingId == l.Id)
+                .OrderByDescending(i => i.IsCover)
+                .ThenBy(i => i.SortOrder)
+                .Take(3)
+                .Select(i => new ListingImageRow(
+                    i.Id,
+                    i.Url
+                ))
+                .ToList(),
+
+            l.FeaturedUntil,
+            l.UrgentUntil,
+            l.LocationCountryCode
+        ))
+        .ToListAsync(ct);
 
         return (items, total);
     }
@@ -180,12 +193,23 @@ l.LocationCountryCode
                 l.LocationRegion,
                 l.PublishedAt ?? DateTime.UtcNow,
                 l.CategoryId,
-                _db.ListingImages
-                    .Where(i => i.ListingId == l.Id)
-                    .OrderByDescending(i => i.IsCover)
-                    .ThenBy(i => i.SortOrder)
-                    .Select(i => i.Url)
-                    .FirstOrDefault(),
+           _db.ListingImages
+            .Where(i => i.ListingId == l.Id)
+            .OrderByDescending(i => i.IsCover)
+            .ThenBy(i => i.SortOrder)
+            .Select(i => i.Url)
+            .FirstOrDefault(),
+
+        _db.ListingImages
+            .Where(i => i.ListingId == l.Id)
+            .OrderByDescending(i => i.IsCover)
+            .ThenBy(i => i.SortOrder)
+            .Take(3)
+            .Select(i => new ListingImageRow(
+                i.Id,
+                i.Url
+            ))
+            .ToList(),
                 l.FeaturedUntil,
 l.UrgentUntil,
 l.LocationCountryCode
@@ -244,12 +268,23 @@ l.LocationCountryCode
                 l.LocationRegion,
                 l.PublishedAt ?? l.CreatedAt,
                 l.CategoryId,
-                _db.ListingImages
-                    .Where(i => i.ListingId == l.Id)
-                    .OrderByDescending(i => i.IsCover)
-                    .ThenBy(i => i.SortOrder)
-                    .Select(i => i.Url)
-                    .FirstOrDefault(),
+         _db.ListingImages
+            .Where(i => i.ListingId == l.Id)
+            .OrderByDescending(i => i.IsCover)
+            .ThenBy(i => i.SortOrder)
+            .Select(i => i.Url)
+            .FirstOrDefault(),
+
+        _db.ListingImages
+            .Where(i => i.ListingId == l.Id)
+            .OrderByDescending(i => i.IsCover)
+            .ThenBy(i => i.SortOrder)
+            .Take(3)
+            .Select(i => new ListingImageRow(
+                i.Id,
+                i.Url
+            ))
+            .ToList(),
                 l.FeaturedUntil,
 l.UrgentUntil,
 l.LocationCountryCode

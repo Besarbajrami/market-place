@@ -1,9 +1,13 @@
 ﻿using Marketplace.Domain.Entities;
 
 namespace Marketplace.Application.Common.Interfaces;
-
+public sealed record ListingImageRow(
+    Guid Id,
+    string Url
+);
 public interface IListingRepository
 {
+
     Task AddAsync(Listing listing, CancellationToken ct = default);
     Task<Listing?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<(IReadOnlyList<Listing> Items, int TotalCount)> SearchAsync(
@@ -50,6 +54,7 @@ public interface IListingRepository
         DateTime PublishedAt,
         Guid CategoryId,
         string? CoverImageUrl,
+         IReadOnlyList<ListingImageRow> Images, // ✅ NEW
         DateTime? FeaturedUntil,
         DateTime? UrgentUntil,
         string CountryCode

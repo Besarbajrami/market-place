@@ -20,6 +20,10 @@ public sealed record SearchListingsV2Query(
     string? CountryCode
 ) : IRequest<Result<SearchListingsV2Response>>;
 
+public sealed record ListingImagePreviewDto(
+    Guid Id,
+    string Url
+);
 
 public sealed record ListingSearchItem(
     Guid Id,
@@ -30,6 +34,7 @@ public sealed record ListingSearchItem(
     string Region,
     DateTime? PublishedAt,
     string? CoverImageUrl,
+    IReadOnlyList<ListingImagePreviewDto> Images, // ✅ NEW
     bool IsFeatured,
     bool IsUrgent,
     CategoryLabelDto Category,
