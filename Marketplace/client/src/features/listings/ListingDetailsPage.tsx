@@ -21,23 +21,15 @@ export function ListingDetailsPage() {
 
   // SAFE DEFAULTS BEFORE RETURNS (important for hook order)
   const images = data?.images ?? [];
-  const initialIndex =
-    images.findIndex(i => i.isCover) >= 0
-      ? images.findIndex(i => i.isCover)
-      : 0;
 
-      const [currentIndex, setCurrentIndex] = useState(0);
-
-      useEffect(() => {
-        if (!images.length) return;
-      
-        const coverIndex = images.findIndex(i => i.isCover);
-        const safeIndex = coverIndex >= 0 ? coverIndex : 0;
-      
-        setCurrentIndex(prev =>
-          prev >= images.length ? safeIndex : prev
-        );
-      }, [images]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  useEffect(() => {
+    if (!images.length) return;
+  
+    const coverIndex = images.findIndex(i => i.isCover);
+    setCurrentIndex(coverIndex >= 0 ? coverIndex : 0);
+  }, [images]);
 
   if (isLoading) return <div>Loading listing...</div>;
   if (isError || !data) return <div>Listing not found.</div>;
