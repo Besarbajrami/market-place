@@ -133,17 +133,15 @@ export function ListingCard({ listing }: Props) {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div
-          style={{
-            display: "flex",
-            height: "100%",
-            width: `${resolvedImages.length * 100}%`,
-            transform: `translateX(-${
-              currentIndex * (100 / resolvedImages.length)
-            }%)`,
-            transition: "transform 0.3s ease"
-          }}
-        >
+   <div
+  style={{
+    display: "flex",
+    height: "100%",
+    width: "100%",
+    transform: `translateX(-${currentIndex * 100}%)`,
+    transition: "transform 0.35s ease"
+  }}
+>
       {resolvedImages.map((img, i) => (
   <div
     key={i}
