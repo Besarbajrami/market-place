@@ -29,12 +29,24 @@ public sealed class ChatHub : Hub
     // Client calls: joinConversation({conversationId})
     public async Task JoinConversation(Guid conversationId, CancellationToken ct = default)
     {
-        var isParticipant = await _conversations.IsParticipantAsync(conversationId, UserId, ct);
-        if (!isParticipant)
-            throw new HubException("Forbidden");
+        var retries = 5;
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(conversationId), ct);
+        for (int i = 0; i < retries; i++)
+        {
+            var isParticipant = await _conversations.IsParticipantAsync(conversationId, UserId, ct);
+
+            if (isParticipant)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(conversationId), ct);
+                return;
+            }
+
+            await Task.Delay(100, ct); // wait 100ms and retry
+        }
+
+        throw new HubException("Forbidden");
     }
+
 
     public Task LeaveConversation(Guid conversationId, CancellationToken ct = default)
         => Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupName(conversationId), ct);
