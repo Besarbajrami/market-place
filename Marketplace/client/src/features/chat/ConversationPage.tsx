@@ -4,7 +4,6 @@ import { useMessages, useSendMessage } from "./useChat";
 import { useAuth } from "../../auth/useAuth";
 import { useConversationHeader } from "./useChat";
 import { useNavigate } from "react-router-dom";
-import { createChatConnection } from "./chatHub";
 import * as signalR from "@microsoft/signalr";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -23,23 +22,25 @@ export function ConversationPage() {
   // ✅ SignalR realtime handling
   useEffect(() => {
     if (!conversationId) return;
-
-    const connection = createChatConnection();
+  
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl("/hubs/chat", {
+        accessTokenFactory: () =>
+          localStorage.getItem("mp_access_token") ?? ""
+      })
+      .withAutomaticReconnect()
+      .build();
+  
     let isMounted = true;
-
+  
     async function start() {
       try {
-        if (connection.state === signalR.HubConnectionState.Disconnected) {
-          await connection.start();
-        }
-
+        await connection.start();
+  
         if (!isMounted) return;
-
+  
         await connection.invoke("JoinConversation", conversationId);
-
-        // Remove previous handler (important to avoid duplicates)
-        connection.off("message:new");
-
+  
         connection.on("message:new", (message) => {
           qc.setQueryData(
             ["conversation-messages", conversationId, 50],
@@ -47,12 +48,11 @@ export function ConversationPage() {
               if (!old || !old.items) {
                 return { items: [message] };
               }
-
-              // Prevent duplicate if already added optimistically
+  
               if (old.items.some((m: any) => m.id === message.id)) {
                 return old;
               }
-
+  
               return {
                 ...old,
                 items: [...old.items, message],
@@ -64,20 +64,15 @@ export function ConversationPage() {
         console.error("SignalR connection error:", err);
       }
     }
-
+  
     start();
-
+  
     return () => {
       isMounted = false;
-
-      connection.off("message:new");
-
-      if (connection.state === signalR.HubConnectionState.Connected) {
-        connection.invoke("LeaveConversation", conversationId)
-          .catch(() => {});
-      }
+      connection.stop(); // 🔥 CRITICAL — clean disconnect
     };
   }, [conversationId, qc]);
+  
 
   // ✅ Auto scroll
   useEffect(() => {
