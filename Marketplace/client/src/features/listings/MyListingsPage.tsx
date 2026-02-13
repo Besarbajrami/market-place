@@ -9,8 +9,7 @@ import { Container } from "../../shared/ui/Container";
 import { Card } from "../../shared/ui/Card";
 import { useTranslation } from "react-i18next";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export function MyListingsPage() {
   const nav = useNavigate();
@@ -22,15 +21,10 @@ export function MyListingsPage() {
 
   if (isLoading) return <div>Loading...</div>;
 
-  /* ---------------------------------- */
-  /* ✅ NEW: hide empty drafts           */
-  /* ---------------------------------- */
   const visibleItems =
     data?.items.filter(x => {
-      // keep non-drafts
       if (x.status !== 0) return true;
 
-      // draft visibility rules
       const hasTitle = x.title?.trim().length > 0;
       const hasPrice = x.price > 0;
       const hasImage = !!x.coverImageUrl;
@@ -40,13 +34,15 @@ export function MyListingsPage() {
 
   return (
     <Container>
-      <div style={{ display: "grid", gap: 16 }}>
+      <div style={{ display: "grid", gap: 20 }}>
         {/* HEADER */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center"
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 12
           }}
         >
           <h1 style={{ margin: 0 }}>
@@ -62,7 +58,7 @@ export function MyListingsPage() {
               background: "var(--primary)",
               color: "white",
               border: 0,
-              padding: "10px 14px",
+              padding: "10px 16px",
               borderRadius: 10,
               cursor: "pointer",
               fontWeight: 700
@@ -72,13 +68,11 @@ export function MyListingsPage() {
           </button>
         </div>
 
-        {/* EMPTY STATE */}
         {visibleItems.length === 0 && (
           <Card>{t("common.NoListingsYet")}</Card>
         )}
 
-        {/* LIST */}
-        <div style={{ display: "grid", gap: 12 }}>
+        <div style={{ display: "grid", gap: 16 }}>
           {visibleItems.map(x => {
             const imageUrl = x.coverImageUrl
               ? x.coverImageUrl.startsWith("http")
@@ -90,65 +84,102 @@ export function MyListingsPage() {
               <Card key={x.id}>
                 <div
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "80px 1fr auto",
-                    gap: 14,
-                    alignItems: "center"
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 14
                   }}
                 >
-                  {/* IMAGE */}
+                  {/* TOP SECTION (Image + Info) */}
                   <div
                     style={{
-                      width: 80,
-                      height: 60,
-                      borderRadius: 8,
-                      backgroundColor: "#f2f2f2",
-                      backgroundImage: `url(${imageUrl})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center"
+                      display: "flex",
+                      gap: 14,
+                      alignItems: "center",
+                      flexWrap: "wrap"
                     }}
-                  />
-
-                  {/* INFO */}
-                  <div>
-                    <div style={{ fontWeight: 800 }}>
-                      {x.title || t("common.Untitled")}
-                    </div>
-
+                  >
+                    {/* IMAGE */}
                     <div
                       style={{
-                        color: "var(--muted)",
-                        fontSize: 14
+                        width: 110,
+                        height: 85,
+                        minWidth: 110,
+                        borderRadius: 10,
+                        backgroundColor: "#f3f4f6",
+                        backgroundImage: `url(${imageUrl})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center"
                       }}
-                    >
-                      {x.price > 0
-                        ? `${x.price} ${x.currency}`
-                        : t("common.PriceNotSet")}
-                    </div>
+                    />
 
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: "var(--muted)"
-                      }}
-                    >
-                      {t("common.Status")}: {x.status}
+                    {/* INFO */}
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontWeight: 800,
+                          fontSize: 16,
+                          marginBottom: 4
+                        }}
+                      >
+                        {x.title || t("common.Untitled")}
+                      </div>
+
+                      <div
+                        style={{
+                          color: "var(--muted)",
+                          fontSize: 14,
+                          marginBottom: 4
+                        }}
+                      >
+                        {x.price > 0
+                          ? `${x.price} ${x.currency}`
+                          : t("common.PriceNotSet")}
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: "var(--muted)"
+                        }}
+                      >
+                        {t("common.Status")}: {x.status}
+                      </div>
                     </div>
                   </div>
 
                   {/* ACTIONS */}
-                  <div style={{ display: "flex", gap: 8 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      flexWrap: "wrap"
+                    }}
+                  >
                     <button
                       onClick={() =>
                         nav(`/me/listings/${x.id}/edit`)
                       }
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        border: "1px solid var(--border)",
+                        background: "white",
+                        cursor: "pointer"
+                      }}
                     >
                       {t("common.Edit")}
                     </button>
 
                     <button
                       onClick={() => del.mutate(x.id)}
-                      style={{ color: "#b91c1c" }}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        border: "1px solid #fca5a5",
+                        background: "#fee2e2",
+                        color: "#b91c1c",
+                        cursor: "pointer"
+                      }}
                     >
                       {t("common.Delete")}
                     </button>
@@ -156,6 +187,23 @@ export function MyListingsPage() {
                     <button
                       onClick={() => publish.mutate(x.id)}
                       disabled={x.status !== 0}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        border: 0,
+                        background:
+                          x.status === 0
+                            ? "var(--primary)"
+                            : "#e5e7eb",
+                        color:
+                          x.status === 0
+                            ? "white"
+                            : "#9ca3af",
+                        cursor:
+                          x.status === 0
+                            ? "pointer"
+                            : "not-allowed"
+                      }}
                     >
                       {t("common.Publish")}
                     </button>

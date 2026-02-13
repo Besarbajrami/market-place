@@ -7,7 +7,7 @@ import { Container } from "../../shared/ui/Container";
 import { Card } from "../../shared/ui/Card";
 import { Badge } from "../../shared/ui/Badge";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export function ListingDetailsPage() {
   const params = useParams();
@@ -26,6 +26,9 @@ export function ListingDetailsPage() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
   useEffect(() => {
     if (!images.length) return;
 
@@ -42,25 +45,39 @@ export function ListingDetailsPage() {
   const isOwner =
     isAuthenticated && user?.id === data.sellerId;
 
-  const currentImage = images[currentIndex];
-
-  const imageUrl =
-    currentImage?.url
-      ? currentImage.url.startsWith("http")
-        ? currentImage.url
-        : `${API_BASE_URL}${currentImage.url}`
-      : "/images/placeholder.png";
-
   function nextImage() {
-    if (images.length <= 1) return;
-    setCurrentIndex(i => (i + 1) % images.length);
+    if (currentIndex < images.length - 1) {
+      setCurrentIndex(i => i + 1);
+    }
   }
 
   function prevImage() {
-    if (images.length <= 1) return;
-    setCurrentIndex(i =>
-      i === 0 ? images.length - 1 : i - 1
-    );
+    if (currentIndex > 0) {
+      setCurrentIndex(i => i - 1);
+    }
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchEndX.current = null;
+    touchStartX.current = e.targetTouches[0].clientX;
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    touchEndX.current = e.targetTouches[0].clientX;
+  }
+
+  function handleTouchEnd() {
+    if (!touchStartX.current || !touchEndX.current) return;
+
+    const distance = touchStartX.current - touchEndX.current;
+
+    const minSwipeDistance = 50;
+
+    if (distance > minSwipeDistance) {
+      nextImage();
+    } else if (distance < -minSwipeDistance) {
+      prevImage();
+    }
   }
 
   function toggleFavorite() {
@@ -94,34 +111,112 @@ export function ListingDetailsPage() {
   return (
     <Container>
       {images.length > 0 && (
-      <div
-      style={{
-        position: "relative",
-        height: "min(500px, 70vh)",
-        width: "100%",
-        background: "#f3f4f6",
-        borderRadius: 12,
-        overflow: "hidden",
-        marginBottom: 16,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      <img
-        src={imageUrl}
-        alt={data.title}
-        style={{
-          maxWidth: "100%",
-          maxHeight: "100%",
-          objectFit: "contain"
-        }}
-      />
+        <div
+          style={{
+            position: "relative",
+            height: "min(500px, 70vh)",
+            width: "100%",
+            background: "#f3f4f6",
+            borderRadius: 12,
+            overflow: "hidden",
+            marginBottom: 16
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* SLIDER TRACK */}
+          <div
+            style={{
+              display: "flex",
+              height: "100%",
+              width: `${images.length * 100}%`,
+              transform: `translateX(-${currentIndex * (100 / images.length)}%)`,
+              transition: "transform 0.4s ease"
+            }}
+          >
+            {images.map((img) => {
+              const url =
+                img.url.startsWith("http")
+                  ? img.url
+                  : `${API_BASE_URL}${img.url}`;
 
+              return (
+                <div
+                  key={img.id}
+                  style={{
+                    flex: "0 0 100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <img
+                    src={url}
+                    alt={data.title}
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      objectFit: "contain"
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          {/* ARROWS */}
           {images.length > 1 && (
             <>
-              <button onClick={prevImage}>‹</button>
-              <button onClick={nextImage}>›</button>
+              {currentIndex > 0 && (
+                <button
+                  onClick={prevImage}
+                  style={{
+                    position: "absolute",
+                    left: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 44,
+                    height: 44,
+                    borderRadius: "50%",
+                    border: "none",
+                    background: "rgba(0,0,0,0.5)",
+                    color: "white",
+                    fontSize: 22,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  ‹
+                </button>
+              )}
+
+              {currentIndex < images.length - 1 && (
+                <button
+                  onClick={nextImage}
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 44,
+                    height: 44,
+                    borderRadius: "50%",
+                    border: "none",
+                    background: "rgba(0,0,0,0.5)",
+                    color: "white",
+                    fontSize: 22,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  ›
+                </button>
+              )}
             </>
           )}
         </div>
