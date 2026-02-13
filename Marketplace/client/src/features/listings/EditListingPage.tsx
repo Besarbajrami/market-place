@@ -48,9 +48,10 @@ export function EditListingPage() {
   const { data: editData, isLoading } = useListingForEdit(listingId);
   const { data: details } = useListingDetails(listingId);
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
   /* ---------------- Form state ---------------- */
   const [country, setCountry] = useState("MK"); // default Macedonia
-  // region you already have
 
   const { data: countries = [] } = useCountries();
   const { data: cities = [] } = useCities(country || null);
@@ -70,8 +71,11 @@ export function EditListingPage() {
   const { data: categoryAttributes = [] } =
     useCategoryAttributes(categoryId || null);
 
-  // ✅ NEW: form-level error message from backend
+  // ✅ form-level error message from backend
   const [formError, setFormError] = useState<string | null>(null);
+
+  // ✅ NEW: upload loading indicator
+  const [isUploading, setIsUploading] = useState(false);
 
   /* ---------------- Init sync ---------------- */
 
@@ -82,7 +86,7 @@ export function EditListingPage() {
     setDescription(editData.description ?? "");
     setPrice(editData.price ? String(editData.price) : "");
     setCurrency(editData.currency ?? "EUR");
-    setCountry(editData.locationCountryCode ?? "MK"); // NEW
+    setCountry(editData.locationCountryCode ?? "MK");
 
     setCity(editData.city ?? "");
     setRegion(editData.region ?? "");
@@ -95,7 +99,7 @@ export function EditListingPage() {
     });
     setAttributeValues(map);
 
-    // ✅ clear old error on load
+    // clear old error on load
     setFormError(null);
   }, [editData]);
 
@@ -104,11 +108,12 @@ export function EditListingPage() {
     setImages(
       details.images.map(i => ({
         id: i.id,
-        url: i.url,
+        // ✅ normalize URL for editor display
+        url: i.url.startsWith("http") ? i.url : `${API_BASE_URL}${i.url}`,
         isCover: i.isCover
       }))
     );
-  }, [details]);
+  }, [details, API_BASE_URL]);
 
   /* ---------------- Actions ---------------- */
 
@@ -140,15 +145,12 @@ export function EditListingPage() {
 
       navigate("/me/listings");
     } catch (err: any) {
-      // ✅ Handles common backend formats:
-      // { message }, { error }, { errors: {...} }, axios Error.message
       const serverMessage =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
-        err?.response?.data?.title || // sometimes validation responses use "title"
+        err?.response?.data?.title ||
         err?.message;
 
-      // If backend returns validation dictionary, show first error
       const dict = err?.response?.data?.errors;
       const firstDictError =
         dict && typeof dict === "object"
@@ -168,6 +170,12 @@ export function EditListingPage() {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
 
+    // ✅ allow selecting same file again later
+    e.target.value = "";
+
+    setIsUploading(true);
+    setFormError(null);
+
     upload.mutate(
       { listingId, files },
       {
@@ -176,10 +184,12 @@ export function EditListingPage() {
             ...prev,
             ...uploaded.map(i => ({
               id: i.imageId,
-              url: i.url,
+              // ✅ normalize URL for immediate preview
+              url: i.url.startsWith("http") ? i.url : `${API_BASE_URL}${i.url}`,
               isCover: i.isCover
             }))
           ]);
+          setIsUploading(false);
         },
         onError: (err: any) => {
           const msg =
@@ -188,6 +198,7 @@ export function EditListingPage() {
             err?.message ||
             "Upload failed";
           setFormError(msg);
+          setIsUploading(false);
         }
       }
     );
@@ -292,7 +303,7 @@ export function EditListingPage() {
                 value={country}
                 onChange={e => {
                   setCountry(e.target.value);
-                  setCity(""); // reset city when country changes
+                  setCity("");
                 }}
                 style={{
                   flex: "0 0 140px",
@@ -330,12 +341,6 @@ export function EditListingPage() {
                   </option>
                 ))}
               </select>
-
-              {/* <input
-                placeholder={t("common.Region") || "Region"}
-                value={region}
-                onChange={e => setRegion(e.target.value)}
-              /> */}
             </div>
           </Section>
 
@@ -357,10 +362,18 @@ export function EditListingPage() {
               multiple
               accept="image/*"
               onChange={onFilesSelected}
+              disabled={isUploading}
               style={{
-                padding: "10px 0"
+                padding: "10px 0",
+                opacity: isUploading ? 0.6 : 1
               }}
             />
+
+            {isUploading && (
+              <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 6 }}>
+                Uploading images...
+              </div>
+            )}
 
             <ListingImagesEditor
               images={images}
@@ -370,7 +383,7 @@ export function EditListingPage() {
             />
           </Section>
 
-          {/* ✅ NEW: Error box (keeps everything else) */}
+          {/* Error box */}
           {formError && (
             <div
               style={{

@@ -127,14 +127,14 @@ export function ListingDetailsPage() {
         >
           {/* SLIDER TRACK */}
           <div
-            style={{
-              display: "flex",
-              height: "100%",
-              width: `${images.length * 100}%`,
-              transform: `translateX(-${currentIndex * (100 / images.length)}%)`,
-              transition: "transform 0.4s ease"
-            }}
-          >
+  style={{
+    display: "flex",
+    height: "100%",
+    width: "100%",
+    transform: `translateX(-${currentIndex * 100}%)`,
+    transition: "transform 0.4s ease"
+  }}
+>
             {images.map((img) => {
               const url =
                 img.url.startsWith("http")
@@ -143,14 +143,15 @@ export function ListingDetailsPage() {
 
               return (
                 <div
-                  key={img.id}
-                  style={{
-                    flex: "0 0 100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}
-                >
+                key={img.id}
+                style={{
+                  minWidth: "100%",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
                   <img
                     src={url}
                     alt={data.title}
