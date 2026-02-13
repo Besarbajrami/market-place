@@ -144,17 +144,28 @@ export function ListingCard({ listing }: Props) {
             transition: "transform 0.3s ease"
           }}
         >
-          {resolvedImages.map((img, i) => (
-            <div
-              key={i}
-              style={{
-                flex: "0 0 100%",
-                backgroundImage: `url(${img})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center"
-              }}
-            />
-          ))}
+      {resolvedImages.map((img, i) => (
+  <div
+    key={i}
+    style={{
+      flex: "0 0 100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "#f3f4f6"
+    }}
+  >
+    <img
+      src={img}
+      alt={listing.title}
+      style={{
+        maxWidth: "100%",
+        maxHeight: "100%",
+        objectFit: "contain"
+      }}
+    />
+  </div>
+))}
         </div>
 
         {/* ARROWS – Desktop only */}
