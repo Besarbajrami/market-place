@@ -7,7 +7,7 @@ import { Container } from "../../shared/ui/Container";
 import { Card } from "../../shared/ui/Card";
 import { Badge } from "../../shared/ui/Badge";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function ListingDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +26,18 @@ export function ListingDetailsPage() {
       ? images.findIndex(i => i.isCover)
       : 0;
 
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+      const [currentIndex, setCurrentIndex] = useState(0);
+
+      useEffect(() => {
+        if (!images.length) return;
+      
+        const coverIndex = images.findIndex(i => i.isCover);
+        const safeIndex = coverIndex >= 0 ? coverIndex : 0;
+      
+        setCurrentIndex(prev =>
+          prev >= images.length ? safeIndex : prev
+        );
+      }, [images]);
 
   if (isLoading) return <div>Loading listing...</div>;
   if (isError || !data) return <div>Listing not found.</div>;
