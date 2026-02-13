@@ -7,7 +7,8 @@ export function createChatConnection() {
 
   connection = new signalR.HubConnectionBuilder()
     .withUrl("/hubs/chat", {
-      accessTokenFactory: () => localStorage.getItem("token") ?? ""
+      accessTokenFactory: () => localStorage.getItem("mp_access_token") ?? ""
+
     })
     .withAutomaticReconnect()
     .build();
