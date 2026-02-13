@@ -94,19 +94,29 @@ export function ListingDetailsPage() {
   return (
     <Container>
       {images.length > 0 && (
-        <div style={{ position: "relative" }}>
-          <img
-            src={imageUrl}
-            alt={data.title}
-            style={{
-              width: "100%",
-              maxHeight: 500,
-              objectFit: "contain",
-              borderRadius: 12,
-              marginBottom: 16,
-              background: "#f3f4f6"
-            }}
-          />
+      <div
+      style={{
+        position: "relative",
+        height: "min(500px, 70vh)",
+        width: "100%",
+        background: "#f3f4f6",
+        borderRadius: 12,
+        overflow: "hidden",
+        marginBottom: 16,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <img
+        src={imageUrl}
+        alt={data.title}
+        style={{
+          maxWidth: "100%",
+          maxHeight: "100%",
+          objectFit: "contain"
+        }}
+      />
 
           {images.length > 1 && (
             <>
