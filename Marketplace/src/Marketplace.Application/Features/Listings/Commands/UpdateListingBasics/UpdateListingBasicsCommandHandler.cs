@@ -47,9 +47,9 @@ public sealed class UpdateListingBasicsCommandHandler
             request.Title,
             request.Description,
             request.Price,
+            request.CountryCode,
             request.Currency,
             request.City,
-            request.CountryCode,
             request.Region,
             request.Condition,
             request.CategoryId);
