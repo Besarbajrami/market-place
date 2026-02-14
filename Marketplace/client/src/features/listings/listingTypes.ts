@@ -56,10 +56,11 @@ export type CategoryLabelDto = {
     maxPrice?: number;
   
     condition?: "new" | "used";
-  
     sort?: "newest" | "price_asc" | "price_desc";
   
     page?: number;
     pageSize?: number;
+    countryCode: "MK";
+
   };
   

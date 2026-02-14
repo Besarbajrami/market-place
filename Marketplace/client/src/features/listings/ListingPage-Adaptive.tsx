@@ -45,7 +45,7 @@ export function ListingsPage() {
       sort,
       page,
       pageSize: 20,
-      countryCode: country
+      countryCode: "MK"
     }),
     [query, city, minPrice, maxPrice, categoryId, sort, page, country]
   );
@@ -173,7 +173,7 @@ export function ListingsPage() {
                 )}
 
                 {/* COUNTRY */}
-                <div style={{ marginBottom: 16 }}>
+                {/* <div style={{ marginBottom: 16 }}>
                   <label style={labelStyle}>
                     {t("common.Country")}
                   </label>
@@ -188,7 +188,7 @@ export function ListingsPage() {
                       </option>
                     ))}
                   </select>
-                </div>
+                </div> */}
 
                 {/* CITY */}
                 <div style={{ marginBottom: 16 }}>
