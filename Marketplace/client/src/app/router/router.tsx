@@ -73,9 +73,7 @@ export const router = createBrowserRouter([
       {
         path: "me/favorites",
         element: (
-          <ProtectedRoute>
             <MyFavoritesPage />
-          </ProtectedRoute>
         )
       },
       
