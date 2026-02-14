@@ -109,7 +109,7 @@ export async function searchListingsV2(
     "/api/listings/search-v2",
     { params }
   );
-
+debugger;
   // ✅ hard guard: never allow items to be undefined
   return {
     ...data,

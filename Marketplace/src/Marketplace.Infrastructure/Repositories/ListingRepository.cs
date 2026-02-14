@@ -90,7 +90,8 @@ public sealed class ListingRepository : IListingRepository
 
         if (!string.IsNullOrWhiteSpace(spec.Region))
             q = q.Where(l => l.LocationRegion == spec.Region);
-
+        if (!string.IsNullOrWhiteSpace(spec.CountryCode))
+            q = q.Where(l => l.LocationCountryCode == spec.CountryCode);
         if (spec.MinPrice is not null)
             q = q.Where(l => l.Price >= spec.MinPrice.Value);
 
