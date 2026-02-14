@@ -77,6 +77,7 @@ export function ListingsPage() {
     setMaxPriceInput("");
     setCategoryIdInput(null);
     setCountryInput("MK");
+
     setQuery(undefined);
     setCity(undefined);
     setMinPrice(undefined);
@@ -93,57 +94,22 @@ export function ListingsPage() {
     !!maxPriceInput;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--bg)"
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Container>
         <div style={{ paddingTop: 40, paddingBottom: 60 }}>
 
-          {/* Hero */}
-          <div
-            style={{
-              textAlign: "center",
-              marginBottom: 50
-            }}
-          >
-            <h1
-              style={{
-                fontSize: "clamp(2.5rem, 6vw, 4rem)",
-                fontWeight: 900,
-                color: "var(--text-primary)",
-                marginBottom: 20
-              }}
-            >
+          {/* HERO */}
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <h1 style={heroTitle}>
               {t("common.FindYourNextDeal")}
             </h1>
-
-            <p
-              style={{
-                fontSize: "1.1rem",
-                color: "var(--text-secondary)",
-                maxWidth: 600,
-                margin: "0 auto"
-              }}
-            >
+            <p style={heroSubtitle}>
               {t("common.HeroSubtitle")}
             </p>
           </div>
 
-          {/* Search Card */}
-          <form
-            onSubmit={onSubmit}
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-              borderRadius: 20,
-              padding: 24,
-              boxShadow: "var(--shadow-sm)",
-              marginBottom: 40
-            }}
-          >
+          {/* SEARCH CARD */}
+          <form onSubmit={onSubmit} style={cardStyle}>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <input
                 placeholder={t("common.SearchListings")}
@@ -165,16 +131,34 @@ export function ListingsPage() {
               </button>
             </div>
 
-            {showFilters && (
-              <div
-                style={{
-                  marginTop: 24,
-                  padding: 20,
-                  background: "var(--bg-light)",
-                  borderRadius: 16,
-                  border: "1px solid var(--border)"
-                }}
+            {/* VIEW + SORT */}
+            <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => setView(v => v === "list" ? "grid" : "list")}
+                style={secondaryButton}
               >
+                {view === "list"
+                  ? "⊞ " + t("common.Grid")
+                  : "☰ " + t("common.List")}
+              </button>
+
+              <select
+                value={sort}
+                onChange={e => setSort(e.target.value as any)}
+                style={inputStyle}
+              >
+                <option value="newest">{t("common.Newest")}</option>
+                <option value="price_asc">{t("common.Price")} ↑</option>
+                <option value="price_desc">{t("common.Price")} ↓</option>
+              </select>
+            </div>
+
+            {/* FILTER PANEL */}
+            {showFilters && (
+              <div style={filterPanel}>
+
+                {/* CATEGORY */}
                 {categories && (
                   <div style={{ marginBottom: 16 }}>
                     <label style={labelStyle}>
@@ -188,6 +172,61 @@ export function ListingsPage() {
                   </div>
                 )}
 
+                {/* COUNTRY */}
+                <div style={{ marginBottom: 16 }}>
+                  <label style={labelStyle}>
+                    {t("common.Country")}
+                  </label>
+                  <select
+                    value={countryInput}
+                    onChange={e => setCountryInput(e.target.value)}
+                    style={inputStyle}
+                  >
+                    {countries.map(c => (
+                      <option key={c.code} value={c.code}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* CITY */}
+                <div style={{ marginBottom: 16 }}>
+                  <label style={labelStyle}>
+                    {t("common.City")}
+                  </label>
+                  <select
+                    value={cityInput}
+                    onChange={e => setCityInput(e.target.value)}
+                    style={inputStyle}
+                  >
+                    <option value="">
+                      {t("common.AllCities")}
+                    </option>
+                    {cities.map(c => (
+                      <option key={c.id} value={c.name}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* PRICE RANGE */}
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
+                  <input
+                    placeholder={t("common.MinPrice")}
+                    value={minPriceInput}
+                    onChange={e => setMinPriceInput(e.target.value)}
+                    style={inputStyle}
+                  />
+                  <input
+                    placeholder={t("common.MaxPrice")}
+                    value={maxPriceInput}
+                    onChange={e => setMaxPriceInput(e.target.value)}
+                    style={inputStyle}
+                  />
+                </div>
+
                 <button
                   type="button"
                   onClick={clearFilters}
@@ -199,7 +238,7 @@ export function ListingsPage() {
             )}
           </form>
 
-          {/* Results */}
+          {/* RESULTS */}
           {isLoading && (
             <div style={{ textAlign: "center", padding: 60 }}>
               {t("common.LoadingListings")}…
@@ -207,30 +246,16 @@ export function ListingsPage() {
           )}
 
           {isError && (
-            <div
-              style={{
-                padding: 20,
-                background: "rgba(255,107,107,0.1)",
-                border: "1px solid rgba(255,107,107,0.3)",
-                borderRadius: 12,
-                color: "var(--primary)"
-              }}
-            >
+            <div style={errorBox}>
               {t("common.FailedToLoadListings")}
-              <div style={{ fontSize: 13, opacity: 0.7 }}>
+              <div style={{ fontSize: 13 }}>
                 {(error as Error)?.message}
               </div>
             </div>
           )}
 
           {!isLoading && items.length === 0 && (
-            <div
-              style={{
-                textAlign: "center",
-                padding: 60,
-                color: "var(--text-secondary)"
-              }}
-            >
+            <div style={{ textAlign: "center", padding: 60 }}>
               {t("common.NoResults")}
             </div>
           )}
@@ -252,35 +277,23 @@ export function ListingsPage() {
                 ))}
               </div>
 
-              {/* Pagination */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: 16,
-                  marginTop: 40
-                }}
-              >
+              <div style={paginationStyle}>
                 <button
                   disabled={page <= 1}
-                  onClick={() =>
-                    setPage(p => Math.max(1, p - 1))
-                  }
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
                   style={secondaryButton}
                 >
                   ← {t("common.Prev")}
                 </button>
 
-                <span style={{ color: "var(--text-secondary)" }}>
+                <span>
                   {t("common.Page")} {page} / {totalPages}
                 </span>
 
                 <button
                   disabled={page >= totalPages}
                   onClick={() =>
-                    setPage(p =>
-                      Math.min(totalPages, p + 1)
-                    )
+                    setPage(p => Math.min(totalPages, p + 1))
                   }
                   style={secondaryButton}
                 >
@@ -295,22 +308,38 @@ export function ListingsPage() {
   );
 }
 
-/* ------------------ SHARED STYLES ------------------ */
+/* ---------- SHARED STYLES ---------- */
+
+const cardStyle: React.CSSProperties = {
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: 20,
+  padding: 24,
+  boxShadow: "var(--shadow-sm)",
+  marginBottom: 40
+};
+
+const filterPanel: React.CSSProperties = {
+  marginTop: 24,
+  padding: 20,
+  background: "var(--bg-light)",
+  borderRadius: 16,
+  border: "1px solid var(--border)"
+};
 
 const inputStyle: React.CSSProperties = {
-  flex: 1,
-  minWidth: 250,
-  padding: "14px 18px",
+  padding: "12px 16px",
   borderRadius: 12,
   border: "1px solid var(--border)",
   background: "var(--surface)",
   color: "var(--text-primary)",
   fontSize: 14,
-  outline: "none"
+  outline: "none",
+  minWidth: 150
 };
 
 const primaryButton: React.CSSProperties = {
-  padding: "14px 24px",
+  padding: "12px 24px",
   borderRadius: 12,
   border: "none",
   background: "var(--primary)",
@@ -320,7 +349,7 @@ const primaryButton: React.CSSProperties = {
 };
 
 const secondaryButton: React.CSSProperties = {
-  padding: "14px 20px",
+  padding: "12px 20px",
   borderRadius: 12,
   border: "1px solid var(--border)",
   background: "var(--surface)",
@@ -328,9 +357,38 @@ const secondaryButton: React.CSSProperties = {
   cursor: "pointer"
 };
 
+const heroTitle: React.CSSProperties = {
+  fontSize: "clamp(2.5rem, 6vw, 4rem)",
+  fontWeight: 900,
+  color: "var(--text-primary)",
+  marginBottom: 16
+};
+
+const heroSubtitle: React.CSSProperties = {
+  fontSize: "1.1rem",
+  color: "var(--text-secondary)",
+  maxWidth: 600,
+  margin: "0 auto"
+};
+
+const paginationStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  gap: 16,
+  marginTop: 40
+};
+
 const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: 13,
   marginBottom: 6,
   color: "var(--text-muted)"
+};
+
+const errorBox: React.CSSProperties = {
+  padding: 20,
+  background: "rgba(255,107,107,0.1)",
+  border: "1px solid rgba(255,107,107,0.3)",
+  borderRadius: 12,
+  color: "var(--primary)"
 };
