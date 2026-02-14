@@ -81,9 +81,9 @@ public class Listing : BaseEntity
         string title,
         string description,
         decimal price,
+            string countryCode,
         string currency,
 
-            string countryCode,
         string city,
         string region,
         string condition,
