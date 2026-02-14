@@ -132,9 +132,9 @@ function NavLinks({
               </Link> */}
           <Link to="/me/listings">{t("common.MyListings")}</Link>
           <Link to="/inbox">{t("common.Inbox")}</Link>
-          <Link to="/me/favorites">{t("common.Favorites")}</Link>
         </>
       )}
+          <Link to="/me/favorites">{t("common.Favorites")}</Link>
 
       {isAdmin && (
         <Link to="/admin/categories" style={{ color: "crimson" }}>
@@ -186,9 +186,9 @@ function MobileMenu({
     </Link> */}
           <Link to="/me/listings" onClick={close}>{t("common.MyListings")}</Link>
           <Link to="/inbox" onClick={close}>{t("common.Inbox")}</Link>
-          <Link to="/me/favorites" onClick={close}>{t("common.Favorites")}</Link>
         </>
       )}
+          <Link to="/me/favorites" onClick={close}>{t("common.Favorites")}</Link>
 
       {isAdmin && (
         <Link to="/admin/categories" onClick={close}>
