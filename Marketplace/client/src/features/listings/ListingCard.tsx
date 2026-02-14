@@ -33,14 +33,15 @@ interface Props {
 export function ListingCard({ listing }: Props) {
   const nav = useNavigate();
   const { t } = useTranslation();
-  const { user } = useAuth();
 
   const addFavorite = useAddFavorite();
   const removeFavorite = useRemoveFavorite();
+  const { user } = useAuth();
 
-  const [isFavorite, setIsFavorite] = useState(() =>
-    user ? !!listing.isFavorite : isGuestFavorite(listing.id)
-  );
+  const [isFavorite, setIsFavorite] = useState(() => {
+    if (user) return !!listing.isFavorite;
+    return isGuestFavorite(listing.id);
+  });
 
   const [isMobile, setIsMobile] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -50,9 +51,7 @@ export function ListingCard({ listing }: Props) {
   const touchEndX = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!user) {
-      setIsFavorite(isGuestFavorite(listing.id));
-    }
+    if (!user) setIsFavorite(isGuestFavorite(listing.id));
   }, [user, listing.id]);
 
   useEffect(() => {
@@ -68,30 +67,22 @@ export function ListingCard({ listing }: Props) {
     ? [{ url: listing.coverImageUrl }]
     : [];
 
-  const resolvedImages = images.map(img =>
-    img.url.startsWith("http") ? img.url : `${API_BASE_URL}${img.url}`
-  );
+  const resolvedImages = images.map(img => {
+    const url = img.url;
+    return url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
+  });
 
-  const isFeatured =
-    listing.featuredUntil &&
-    new Date(listing.featuredUntil) > new Date();
-
-  const isUrgent =
-    listing.urgentUntil &&
-    new Date(listing.urgentUntil) > new Date();
+  const isFeatured = listing.featuredUntil && new Date(listing.featuredUntil) > new Date();
+  const isUrgent = listing.urgentUntil && new Date(listing.urgentUntil) > new Date();
 
   function nextImage(e?: React.MouseEvent) {
     e?.stopPropagation();
-    if (currentIndex < resolvedImages.length - 1) {
-      setCurrentIndex(i => i + 1);
-    }
+    if (currentIndex < resolvedImages.length - 1) setCurrentIndex(i => i + 1);
   }
 
   function prevImage(e?: React.MouseEvent) {
     e?.stopPropagation();
-    if (currentIndex > 0) {
-      setCurrentIndex(i => i - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex(i => i - 1);
   }
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -109,37 +100,65 @@ export function ListingCard({ listing }: Props) {
     if (distance < -50) prevImage();
   }
 
+  const arrowStyle = (side: "left" | "right"): React.CSSProperties => ({
+    position: "absolute",
+    [side]: 8,
+    top: "50%",
+    transform: "translateY(-50%)",
+    width: 30,
+    height: 30,
+    borderRadius: "50%",
+    border: "1px solid var(--border)",
+    background: "rgba(0,0,0,0.45)",
+    color: "#fff",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  });
+
+  const badgeStyle = (bg: string, left = 10): React.CSSProperties => ({
+    position: "absolute",
+    top: 10,
+    left,
+    background: bg,
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: 800,
+    padding: "5px 8px",
+    borderRadius: 8,
+    boxShadow: "var(--shadow-sm)"
+  });
+
   return (
     <div
-      onClick={() =>
-        nav(`/listings/${listing.id}/${slugify(listing.title)}`)
-      }
+      onClick={() => nav(`/listings/${listing.id}/${slugify(listing.title)}`)}
       style={{
         cursor: "pointer",
         display: "grid",
-        gridTemplateColumns: isMobile ? "1fr" : "160px 1fr",
-        gap: 16,
+        gridTemplateColumns: isMobile ? "1fr" : "140px 1fr",
+        gap: 14,
         background: "var(--surface)",
         border: "1px solid var(--border)",
-        borderRadius: 16,
+        borderRadius: 14,
         overflow: "hidden",
         boxShadow: "var(--shadow-sm)",
         position: "relative",
-        transition: "all 0.2s ease",
-        color: "var(--text-primary)",
-        transform: isHovering ? "translateY(-2px)" : "none"
+        transition: "var(--transition-base)",
+        color: "var(--text-primary)"
       }}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
     >
-      {/* IMAGE */}
+      {/* IMAGE SLIDER */}
       <div
         style={{
           position: "relative",
-          height: isMobile ? 200 : 140,
+          width: isMobile ? "100%" : 140,
+          height: isMobile ? 180 : 110,
           overflow: "hidden",
-          background: "var(--bg-light)"
+          background: "var(--bg-soft)"
         }}
+        onMouseEnter={() => !isMobile && setIsHovering(true)}
+        onMouseLeave={() => !isMobile && setIsHovering(false)}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -148,70 +167,69 @@ export function ListingCard({ listing }: Props) {
           style={{
             display: "flex",
             height: "100%",
+            width: "100%",
             transform: `translateX(-${currentIndex * 100}%)`,
             transition: "transform 0.35s ease"
           }}
         >
-          {resolvedImages.map((img, i) => (
+          {(resolvedImages.length ? resolvedImages : ["/images/placeholder.png"]).map((img, i) => (
             <div
               key={i}
               style={{
                 flex: "0 0 100%",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center"
+                justifyContent: "center",
+                background: "var(--bg-soft)"
               }}
             >
               <img
                 src={img}
                 alt={listing.title}
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain"
-                }}
+                style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
               />
             </div>
           ))}
         </div>
 
-        {!isMobile && resolvedImages.length > 1 && (
+        {/* Arrows (desktop hover) */}
+        {!isMobile && isHovering && resolvedImages.length > 1 && (
           <>
             {currentIndex > 0 && (
-              <button onClick={prevImage} style={arrowStyle("left")}>‹</button>
+              <button onClick={prevImage} style={arrowStyle("left")}>
+                ‹
+              </button>
             )}
             {currentIndex < resolvedImages.length - 1 && (
-              <button onClick={nextImage} style={arrowStyle("right")}>›</button>
+              <button onClick={nextImage} style={arrowStyle("right")}>
+                ›
+              </button>
             )}
           </>
         )}
       </div>
 
       {/* CONTENT */}
-      <div style={{ padding: isMobile ? 14 : 16 }}>
-        <div style={{ fontWeight: 700, fontSize: 17 }}>
+      <div style={{ padding: isMobile ? 12 : "10px 12px 10px 0" }}>
+        {/* Title */}
+        <div style={{ fontWeight: 800, color: "var(--text-primary)" }}>
           {listing.title}
         </div>
 
-        <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4 }}>
+        {/* Category + Date */}
+        <div style={{ marginTop: 4, fontSize: 12, color: "var(--text-muted)" }}>
           {listing.categoryName && <>{listing.categoryName} · </>}
-          {listing.publishedAt &&
-            new Date(listing.publishedAt).toLocaleDateString()}
+          {listing.publishedAt && new Date(listing.publishedAt).toLocaleDateString()}
         </div>
 
-        <div style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 6 }}>
-          📍 {listing.city}
+        {/* City + Region */}
+        <div style={{ marginTop: 6, fontSize: 13, color: "var(--text-secondary)" }}>
+          <span style={{ opacity: 0.7 }}>📍</span> {listing.city}
           {listing.region && ` · ${listing.region}`}
         </div>
 
-        <div
-          style={{
-            marginTop: 12,
-            fontSize: 20,
-            fontWeight: 800,
-            color: "var(--primary)"
-          }}
-        >
+        {/* Price */}
+        <div style={{ marginTop: 10, fontSize: 18, fontWeight: 900, color: "var(--text-primary)" }}>
           {listing.price} {listing.currency}
         </div>
       </div>
@@ -222,15 +240,14 @@ export function ListingCard({ listing }: Props) {
           e.stopPropagation();
           const next = !isFavorite;
           setIsFavorite(next);
+
           try {
             if (user) {
-              next
-                ? await addFavorite.mutateAsync(listing.id)
-                : await removeFavorite.mutateAsync(listing.id);
+              if (next) await addFavorite.mutateAsync(listing.id);
+              else await removeFavorite.mutateAsync(listing.id);
             } else {
-              next
-                ? addGuestFavorite(listing.id)
-                : removeGuestFavorite(listing.id);
+              if (next) addGuestFavorite(listing.id);
+              else removeGuestFavorite(listing.id);
             }
           } catch {
             setIsFavorite(!next);
@@ -238,64 +255,27 @@ export function ListingCard({ listing }: Props) {
         }}
         style={{
           position: "absolute",
-          top: 12,
-          right: 12,
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "50%",
+          top: 8,
+          right: 8,
           width: 34,
           height: 34,
+          borderRadius: "50%",
+          border: "1px solid var(--border)",
+          background: "var(--surface)",
           cursor: "pointer",
           fontSize: 16,
           color: isFavorite ? "var(--primary)" : "var(--text-muted)",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "rgba(0, 0, 0, 0.2) 0px 4px 12px",
-          transform: "scale(1)",
+          justifyContent: "center"
         }}
-        
       >
         {isFavorite ? "♥" : "♡"}
       </button>
-       
-      {isFeatured && (
-        <div style={badgeStyle("var(--secondary)")}>
-          {t("common.FEATURED")}
-        </div>
-      )}
 
-      {isUrgent && (
-        <div style={badgeStyle("var(--primary)", 80)}>
-          {t("common.URGENT")}
-        </div>
-      )}
+      {/* BADGES */}
+      {isFeatured && <div style={badgeStyle("var(--secondary)", 10)}>⭐ {t("common.FEATURED")}</div>}
+      {isUrgent && <div style={badgeStyle("var(--primary)", isFeatured ? 110 : 10)}>🔥 {t("common.URGENT")}</div>}
     </div>
   );
 }
-
-const arrowStyle = (side: "left" | "right"): React.CSSProperties => ({
-  position: "absolute",
-  [side]: 8,
-  top: "50%",
-  transform: "translateY(-50%)",
-  width: 28,
-  height: 28,
-  borderRadius: "50%",
-  border: "none",
-  background: "rgba(0,0,0,0.5)",
-  color: "white",
-  cursor: "pointer"
-});
-
-const badgeStyle = (bg: string, left = 10): React.CSSProperties => ({
-  position: "absolute",
-  top: 10,
-  left,
-  background: bg,
-  color: "white",
-  fontSize: 11,
-  fontWeight: 700,
-  padding: "4px 8px",
-  borderRadius: 8
-});

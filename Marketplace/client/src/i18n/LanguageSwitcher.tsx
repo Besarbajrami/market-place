@@ -1,24 +1,37 @@
 import { useTranslation } from "react-i18next";
-import { SUPPORTED_LANGUAGES } from "../i18n/languages";
 
-export function LanguageSwitcher() {
+interface Props {
+  compact?: boolean;
+}
+
+export function LanguageSwitcher({ compact }: Props) {
   const { i18n } = useTranslation();
 
   return (
-    <select
-      value={i18n.language}
-      onChange={e => i18n.changeLanguage(e.target.value)}
+    <button
+      onClick={() =>
+        i18n.changeLanguage(
+          i18n.language === "en" ? "mk" : "en"
+        )
+      }
       style={{
-        padding: "6px 10px",
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "8px 10px",
         borderRadius: 8,
-        border: "1px solid var(--border)"
+        border: "1px solid var(--border)",
+        background: "var(--surface)",
+        color: "var(--text-primary)",
+        cursor: "pointer"
       }}
     >
-      {SUPPORTED_LANGUAGES.map(l => (
-        <option key={l} value={l}>
-          {l.toUpperCase()}
-        </option>
-      ))}
-    </select>
+      🌐
+      {!compact && (
+        <span style={{ fontSize: 13 }}>
+          {i18n.language.toUpperCase()}
+        </span>
+      )}
+    </button>
   );
 }
