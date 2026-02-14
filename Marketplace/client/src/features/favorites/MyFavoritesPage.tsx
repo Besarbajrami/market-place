@@ -6,6 +6,7 @@ import { Card } from "../../shared/ui/Card";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/useAuth";
 import { getGuestFavorites } from "./localFavorites";
+import { useListingDetails } from "../listings/useListingDetails";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL;
@@ -76,23 +77,66 @@ export function MyFavoritesPage() {
             </Card>
           );
         })}
-       {!user &&
-          guestIds.map(id => (
-            <Card
-              key={id}
-              onClick={() => nav(`/listings/${id}`)}
-              style={{ cursor: "pointer" }}
-            >
-              <div style={{ padding: 16 }}>
-                <div style={{ fontWeight: 700 }}>
-                  {t("common.ViewListing")}
-                </div>
-                <div style={{ fontSize: 13, color: "var(--muted)" }}>
-                  {id}
-                </div>
-              </div>
-            </Card>
-          ))}
+   {!user &&
+  guestIds.map(id => {
+    const { data: listing } = useListingDetails(id);
+
+    if (!listing) return null;
+
+    const imageUrl =
+      listing.images?.length
+        ? listing.images[0].url.startsWith("http")
+          ? listing.images[0].url
+          : `${API_BASE_URL}${listing.images[0].url}`
+        : "/images/placeholder.png";
+
+    return (
+      <Card
+        key={id}
+        onClick={() => nav(`/listings/${id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "80px 1fr",
+            gap: 14,
+            alignItems: "center"
+          }}
+        >
+          {/* IMAGE */}
+          <div
+            style={{
+              width: 80,
+              height: 60,
+              borderRadius: 8,
+              backgroundColor: "#f2f2f2",
+              backgroundImage: `url(${imageUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center"
+            }}
+          />
+
+          {/* INFO */}
+          <div>
+            <div style={{ fontWeight: 800 }}>
+              {listing.title}
+            </div>
+
+            <div style={{ color: "var(--muted)", fontSize: 13 }}>
+              {listing.city}
+              {listing.region && ` · ${listing.region}`}
+            </div>
+
+            <div style={{ fontWeight: 700, marginTop: 4 }}>
+              {listing.price} {listing.currency}
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  })}
+
 
         {!user && guestIds.length === 0 && (
           <div style={{ color: "var(--muted)" }}>
