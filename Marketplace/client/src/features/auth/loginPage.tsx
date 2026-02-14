@@ -19,17 +19,44 @@ export function LoginPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-
+  
     try {
       const tokens = await login(email, password);
       loginWithTokens(tokens.accessToken, tokens.refreshToken);
-
-      // ✅ redirect ONLY after successful login
       nav(from, { replace: true });
-    } catch {
-      setError("Invalid email or password");
+  
+    } catch (err: any) {
+      // ✅ If backend returns structured error
+      if (err.response?.data) {
+  
+        // If backend sends: { message: "Invalid credentials" }
+        if (typeof err.response.data === "string") {
+          setError(err.response.data);
+        }
+  
+        // If backend sends: { error: { message: "..." } }
+        else if (err.response.data.error?.message) {
+          setError(err.response.data.error.message);
+        }
+  
+        // If backend sends validation errors
+        else if (err.response.data.errors) {
+          const firstError = Object.values(err.response.data.errors)[0];
+          if (Array.isArray(firstError)) {
+            setError(firstError[0]);
+          }
+        }
+  
+        else {
+          setError("Login failed");
+        }
+  
+      } else {
+        setError("Network error");
+      }
     }
   }
+  
 
   return (
     <div style={{ maxWidth: 420, margin: "60px auto" }}>

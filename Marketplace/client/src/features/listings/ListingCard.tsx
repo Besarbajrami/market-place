@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAddFavorite, useRemoveFavorite } from "../favorites/useFavorite";
 import { useMemo, useState, useEffect, useRef } from "react";
+import { useAuth } from "../../auth/useAuth";
+import {
+  addGuestFavorite,
+  removeGuestFavorite,
+  isGuestFavorite
+} from "../favorites/localFavorites";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -30,8 +36,13 @@ export function ListingCard({ listing }: Props) {
 
   const addFavorite = useAddFavorite();
   const removeFavorite = useRemoveFavorite();
+  const { user } = useAuth();
 
-  const [isFavorite, setIsFavorite] = useState(!!listing.isFavorite);
+  const [isFavorite, setIsFavorite] = useState(() => {
+    if (user) return !!listing.isFavorite;
+    return isGuestFavorite(listing.id);
+  });
+  
   const [isMobile, setIsMobile] = useState(false);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -39,7 +50,12 @@ export function ListingCard({ listing }: Props) {
 
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
-
+  useEffect(() => {
+    if (!user) {
+      setIsFavorite(isGuestFavorite(listing.id));
+    }
+  }, [user, listing.id]);
+  
   useEffect(() => {
     const update = () => setIsMobile(window.innerWidth <= 640);
     update();
@@ -216,27 +232,44 @@ export function ListingCard({ listing }: Props) {
 
       {/* FAVORITE */}
       <button
-        onClick={e => {
-          e.stopPropagation();
-          const next = !isFavorite;
-          setIsFavorite(next);
-          (next
-            ? addFavorite.mutateAsync(listing.id)
-            : removeFavorite.mutateAsync(listing.id)
-          ).catch(() => setIsFavorite(!next));
-        }}
-        style={{
-          position: "absolute",
-          top: 8,
-          right: 8,
-          background: "transparent",
-          border: 0,
-          fontSize: 18,
-          cursor: "pointer"
-        }}
-      >
-        {isFavorite ? "♥" : "♡"}
-      </button>
+  onClick={async e => {
+    e.stopPropagation();
+
+    const next = !isFavorite;
+    setIsFavorite(next);
+
+    try {
+      if (user) {
+        if (next) {
+          await addFavorite.mutateAsync(listing.id);
+        } else {
+          await removeFavorite.mutateAsync(listing.id);
+        }
+      } else {
+        // 🔥 Guest mode
+        if (next) {
+          addGuestFavorite(listing.id);
+        } else {
+          removeGuestFavorite(listing.id);
+        }
+      }
+    } catch {
+      setIsFavorite(!next); // rollback
+    }
+  }}
+  style={{
+    position: "absolute",
+    top: 8,
+    right: 8,
+    background: "transparent",
+    border: 0,
+    fontSize: 18,
+    cursor: "pointer"
+  }}
+>
+  {isFavorite ? "♥" : "♡"}
+</button>
+
 
       {isFeatured && (
         <div style={badgeFeaturedStyle}>

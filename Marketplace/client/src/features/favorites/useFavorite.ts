@@ -1,13 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addFavorite, removeFavorite, getMyFavorites } from "./favoritesApi";
 
-export function useMyFavorites(page: number, pageSize: number) {
+export function useMyFavorites(
+  page: number,
+  pageSize: number,
+  enabled: boolean
+) {
   return useQuery({
     queryKey: ["my-favorites", page, pageSize],
     queryFn: () => getMyFavorites(page, pageSize),
-    staleTime: 30_000
+    staleTime: 30_000,
+    enabled
   });
 }
+
 
 export function useAddFavorite() {
   const qc = useQueryClient();
