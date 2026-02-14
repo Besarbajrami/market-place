@@ -21,31 +21,44 @@ export function RegisterPage() {
       await register(email, password);
       nav("/login");
 
-    } catch (err: any) {
-
+    } 
+    catch (err: any) {
       if (err.response?.data) {
-
-        if (typeof err.response.data === "string") {
-          setError(err.response.data);
+    
+        const data = err.response.data;
+    
+        // ✅ CASE 1: backend returns array of Identity errors
+        if (Array.isArray(data) && data.length > 0) {
+          setError(data[0].description);
         }
-        else if (err.response.data.error?.message) {
-          setError(err.response.data.error.message);
+    
+        // ✅ CASE 2: plain string
+        else if (typeof data === "string") {
+          setError(data);
         }
-        else if (err.response.data.errors) {
-          const firstError = Object.values(err.response.data.errors)[0];
+    
+        // ✅ CASE 3: structured { error: { message } }
+        else if (data.error?.message) {
+          setError(data.error.message);
+        }
+    
+        // ✅ CASE 4: validation errors { errors: { field: [] } }
+        else if (data.errors) {
+          const firstError = Object.values(data.errors)[0];
           if (Array.isArray(firstError)) {
             setError(firstError[0]);
           }
         }
+    
         else {
           setError(t("common.RegistrationFailed"));
         }
-
+    
       } else {
         setError(t("common.NetworkError"));
       }
-
-    } finally {
+    }
+    finally {
       setLoading(false);
     }
   }

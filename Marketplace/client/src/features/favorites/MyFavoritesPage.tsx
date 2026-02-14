@@ -66,7 +66,7 @@ export function MyFavoritesPage() {
                   }}
                   style={removeButtonStyle}
                 >
-                  ♥
+                 x
                 </button>
 
                 <div
@@ -189,7 +189,7 @@ function GuestFavoriteCard({
         }}
         style={removeButtonStyle}
       >
-        ♥
+        x
       </button>
 
       <div
