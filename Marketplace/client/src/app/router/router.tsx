@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "./AppLayout";
-import { ListingsPage } from "../../features/listings/ListingPage";
+import { ListingsPage } from "../../features/listings/ListingPage-Adaptive";
 import { LoginPage } from "../../features/auth/loginPage";
 import { RegisterPage } from "../../features/auth/RegisterPage";
 import { ProtectedRoute } from "../../auth/ProtectedRoute";

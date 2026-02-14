@@ -1,0 +1,308 @@
+/* Modern Header Styles - Theme-Aware (Light & Dark) */
+
+/* ============================================ */
+/* HEADER VARIABLES - Dark Theme (Default)     */
+/* ============================================ */
+:root,
+[data-theme="dark"] {
+  --header-bg: rgba(15, 15, 26, 0.85);
+  --header-border: rgba(255, 255, 255, 0.1);
+  --header-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  
+  --nav-text: rgba(255, 255, 255, 0.8);
+  --nav-text-hover: #ffffff;
+  --nav-bg-hover: rgba(255, 255, 255, 0.1);
+  --nav-bg-active: rgba(255, 255, 255, 0.15);
+  
+  --user-email-bg: rgba(78, 205, 196, 0.15);
+  --user-email-border: rgba(78, 205, 196, 0.3);
+  --user-email-color: #4ecdc4;
+  
+  --btn-ghost-border: rgba(255, 255, 255, 0.2);
+  --btn-ghost-color: #fff;
+  --btn-ghost-hover-bg: rgba(255, 255, 255, 0.1);
+  
+  --mobile-menu-bg: rgba(26, 26, 46, 0.95);
+  --mobile-menu-border: rgba(255, 255, 255, 0.1);
+  --mobile-item-bg: rgba(255, 255, 255, 0.05);
+  --mobile-item-border: rgba(255, 255, 255, 0.1);
+  --mobile-item-hover-bg: rgba(255, 255, 255, 0.1);
+  
+  --hamburger-bg: rgba(255, 255, 255, 0.1);
+  --hamburger-border: rgba(255, 255, 255, 0.2);
+  --hamburger-color: #fff;
+  --hamburger-hover-bg: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================ */
+/* HEADER VARIABLES - Light Theme              */
+/* ============================================ */
+[data-theme="light"] {
+  --header-bg: rgba(255, 255, 255, 0.85);
+  --header-border: rgba(0, 0, 0, 0.08);
+  --header-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  
+  --nav-text: #475569;
+  --nav-text-hover: #1a202c;
+  --nav-bg-hover: #f8fafc;
+  --nav-bg-active: #f1f5f9;
+  
+  --user-email-bg: rgba(78, 205, 196, 0.1);
+  --user-email-border: rgba(78, 205, 196, 0.2);
+  --user-email-color: #0d9488;
+  
+  --btn-ghost-border: #e2e8f0;
+  --btn-ghost-color: #475569;
+  --btn-ghost-hover-bg: #f8fafc;
+  
+  --mobile-menu-bg: rgba(255, 255, 255, 0.95);
+  --mobile-menu-border: rgba(0, 0, 0, 0.08);
+  --mobile-item-bg: #ffffff;
+  --mobile-item-border: #e2e8f0;
+  --mobile-item-hover-bg: #f8fafc;
+  
+  --hamburger-bg: #ffffff;
+  --hamburger-border: #e2e8f0;
+  --hamburger-color: #475569;
+  --hamburger-hover-bg: #f8fafc;
+}
+
+/* ============================================ */
+/* HEADER STYLES                               */
+/* ============================================ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--header-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: var(--header-shadow);
+  transition: all 0.3s ease;
+}
+
+.headerInner {
+  height: auto;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Logo */
+.logo {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-size: 22px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.nav a {
+  font-size: 14px;
+  color: var(--nav-text);
+  padding: 10px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav a:hover {
+  background: var(--nav-bg-hover);
+  color: var(--nav-text-hover);
+}
+
+.nav a.active {
+  background: var(--nav-bg-active);
+  color: var(--nav-text-hover);
+}
+
+/* Right Section */
+.right {
+  margin-left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* User Email Badge */
+.userEmail {
+  font-size: 13px;
+  color: var(--user-email-color);
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: var(--user-email-bg);
+  border: 1px solid var(--user-email-border);
+  font-weight: 500;
+}
+
+/* Primary Button (Gradient - Theme Independent) */
+.primaryBtn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.primaryBtn:active {
+  transform: translateY(0);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Ghost Button */
+.ghostBtn {
+  background: transparent;
+  border: 1px solid var(--btn-ghost-border);
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--btn-ghost-color);
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.ghostBtn:hover {
+  background: var(--btn-ghost-hover-bg);
+}
+
+.ghostBtn:active {
+  background: var(--nav-bg-active);
+}
+
+/* Admin Link - Special Styling */
+.adminLink {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  font-weight: 600;
+}
+
+.adminLink:hover {
+  background: rgba(255, 107, 107, 0.3);
+  color: #ff8787;
+}
+
+/* Mobile Menu */
+.mobileMenu {
+  border-top: 1px solid var(--mobile-menu-border);
+  background: var(--mobile-menu-bg);
+  backdrop-filter: blur(20px);
+  animation: slideDown 0.3s ease-out;
+  padding: 20px;
+}
+
+.mobileMenuItem {
+  padding: 14px 20px;
+  border-radius: 12px;
+  color: var(--nav-text);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  background: var(--mobile-item-bg);
+  border: 1px solid var(--mobile-item-border);
+  transition: all 0.3s ease;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.mobileMenuItem:hover {
+  background: var(--mobile-item-hover-bg);
+  color: var(--nav-text-hover);
+}
+
+.mobileMenuItem:last-child {
+  margin-bottom: 0;
+}
+
+/* Hamburger Button */
+.hamburger {
+  background: var(--hamburger-bg);
+  border: 1px solid var(--hamburger-border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 20px;
+  color: var(--hamburger-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hamburger:hover {
+  background: var(--hamburger-hover-bg);
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .headerInner {
+    padding: 12px 16px;
+  }
+  
+  .logo {
+    font-size: 18px;
+  }
+  
+  .nav {
+    display: none;
+  }
+  
+  .right {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobileMenu {
+    display: none;
+  }
+  
+  .hamburger {
+    display: none;
+  }
+}

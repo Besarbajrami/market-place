@@ -3,6 +3,7 @@ import { useAuth } from "../../auth/useAuth";
 import { useState } from "react";
 import { LanguageSwitcher } from "../../i18n/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import { ThemeToggle } from "../../features/hooks/ThemeToggle";
 
 export function AppHeader() {
   const { t } = useTranslation();
@@ -62,10 +63,11 @@ export function AppHeader() {
         </Link>
 
         {/* LANGUAGE SWITCHER */}
-        <div style={{ marginLeft: 16 }}>
-          <LanguageSwitcher />
-        </div>
 
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <LanguageSwitcher />
+        <ThemeToggle />  {/* Add this */}
+      </div>
         {/* DESKTOP NAV */}
         <nav className="desktop-nav" style={{ marginLeft: "auto", marginRight: 24 }}>
           <NavLinks isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
