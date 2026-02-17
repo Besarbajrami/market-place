@@ -188,7 +188,10 @@ public sealed class ListingRepository : IListingRepository
     SearchPendingAsync(int page, int pageSize, CancellationToken ct = default)
     {
         var q = _db.Listings
-            .Where(l =>  l.ModerationStatus == ModerationStatus.Pending)
+            .Where(l =>  l.ModerationStatus == ModerationStatus.Pending &&
+    !string.IsNullOrWhiteSpace(l.Title) &&
+    !string.IsNullOrWhiteSpace(l.Description) &&
+    l.Images.Any())
             .OrderByDescending(l => l.CreatedAt);
 
         var total = await q.CountAsync(ct);
