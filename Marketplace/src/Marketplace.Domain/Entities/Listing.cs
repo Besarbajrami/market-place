@@ -127,30 +127,45 @@ public class Listing : BaseEntity
 
         UpdatedAt = DateTime.UtcNow;
     }
+    //public void PublishByAdmin()
+    //{
+    //    if (ModerationStatus != ModerationStatus.Pending)
+    //        throw new InvalidOperationException("Listing must be pending review.");
 
-    public void Publish()
-    {
-        if (Status != ListingStatus.Draft)
-            throw new InvalidOperationException("Only draft listings can be published.");
+    //    Status = ListingStatus.Published;
+    //    ModerationStatus = ModerationStatus.Approved;
 
-        if (!CanPublish())
-            throw new InvalidOperationException(GetPublishInvalidReason());
+    //    PublishedAt = DateTime.UtcNow;
+    //    UpdatedAt = PublishedAt.Value;
+    //}
 
-        Status = ListingStatus.Published;
-        ModerationStatus = ModerationStatus.Pending;
+    //public void Publish()
+    //{
+    //    if (Status != ListingStatus.Draft)
+    //        throw new InvalidOperationException("Only draft listings can be published.");
 
-        PublishedAt = DateTime.UtcNow;
-        UpdatedAt = PublishedAt.Value;
-    }
+    //    if (!CanPublish())
+    //        throw new InvalidOperationException(GetPublishInvalidReason());
 
-    public void Approve()
-    {
-        if (ModerationStatus != ModerationStatus.Pending)
-            throw new InvalidOperationException("Only pending listings can be approved.");
+    //    Status = ListingStatus.Published;
+    //    ModerationStatus = ModerationStatus.Pending;
 
-        ModerationStatus = ModerationStatus.Approved;
-        UpdatedAt = DateTime.UtcNow;
-    }
+    //    PublishedAt = DateTime.UtcNow;
+    //    UpdatedAt = PublishedAt.Value;
+    //}
+
+    //public void Approve()
+    //{
+    //    if (Status != ListingStatus.PendingReview)
+    //        throw new InvalidOperationException("Listing is not under review.");
+
+    //    Status = ListingStatus.Published;
+    //    ModerationStatus = ModerationStatus.Approved;
+
+    //    PublishedAt = DateTime.UtcNow;
+    //    UpdatedAt = PublishedAt.Value;
+    //}
+
 
     public void Reject(string reason)
     {
@@ -207,14 +222,15 @@ public class Listing : BaseEntity
 
         UpdatedAt = DateTime.UtcNow;
     }
-    public void MarkUnderReview()
-    {
-        if (ModerationStatus == ModerationStatus.Hidden)
-            return;
+    //public void MarkUnderReview()
+    //{
+    //    if (Status != ListingStatus.Draft)
+    //        throw new InvalidOperationException("Only draft listings can be submitted.");
 
-        ModerationStatus = ModerationStatus.UnderReview;
-        UpdatedAt = DateTime.UtcNow;
-    }
+    //    ModerationStatus = ModerationStatus.UnderReview;
+    //    UpdatedAt = DateTime.UtcNow;
+    //}
+
 
     public void IncrementReportCount()
     {
@@ -343,12 +359,37 @@ public class Listing : BaseEntity
 
         UpdatedAt = DateTime.UtcNow;
     }
-    private void TryAutoPublish()
+    public void SubmitForReview()
     {
-        if (CanPublish())
-        {
-            Publish();
-        }
+        if (Status != ListingStatus.Draft)
+            throw new InvalidOperationException("Only draft listings can be submitted.");
+
+        if (!CanPublish())
+            throw new InvalidOperationException(GetPublishInvalidReason());
+
+        Status = ListingStatus.PendingReview;
+        ModerationStatus = ModerationStatus.Pending;
+        UpdatedAt = DateTime.UtcNow;
     }
+
+
+    public void ApproveAndPublish()
+    {
+        if (ModerationStatus != ModerationStatus.Pending)
+            throw new InvalidOperationException("Listing is not pending review.");
+
+        Status = ListingStatus.Published;
+        ModerationStatus = ModerationStatus.Approved;
+        PublishedAt = DateTime.UtcNow;
+        UpdatedAt = PublishedAt.Value;
+    }
+
+    //private void TryAutoPublish()
+    //{
+    //    if (CanPublish())
+    //    {
+    //        Publish();
+    //    }
+    //}
 
 }

@@ -1,15 +1,17 @@
-﻿using MediatR;
-using Marketplace.Application.Common.Results;
+﻿//using MediatR;
+//using Marketplace.Application.Common.Results;
 
-namespace Marketplace.Application.Features.Listings.Commands.PublishListing;
+//namespace Marketplace.Application.Features.Listings.Commands.PublishListing;
 
-public sealed record PublishListingCommand(
-    Guid ListingId,
-    Guid SellerId
-) : IRequest<Result<PublishListingResponse>>;
+//public sealed record PublishListingCommand(
+//    Guid ListingId,
+//    Guid SellerId
+//) : IRequest<Result<PublishListingResponse>>;
+//public sealed record SubmitForReviewCommand(Guid ListingId, Guid SellerId)
+//    : IRequest<Result>;
 
-public sealed record PublishListingResponse(
-    Guid ListingId,
-    int Status,
-    DateTime? PublishedAt
-);
+//public sealed record PublishListingResponse(
+//    Guid ListingId,
+//    int Status,
+//    DateTime? PublishedAt
+//);

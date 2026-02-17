@@ -44,7 +44,8 @@ public sealed class ReportListingCommandHandler
 
         // Update listing counters/status
         listing.IncrementReportCount();
-        listing.MarkUnderReview();
+        listing.SubmitForReview();
+
 
         var openCount = await _reports.CountOpenForListingAsync(request.ListingId, ct);
         if (openCount >= AutoHideThreshold)

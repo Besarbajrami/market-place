@@ -21,16 +21,18 @@ export function MyListingsPage() {
 
   if (isLoading) return <div>Loading...</div>;
 
-  const visibleItems =
-    data?.items.filter(x => {
-      if (x.status !== 0) return true;
+  const items = data?.items ?? [];
 
-      const hasTitle = x.title?.trim().length > 0;
-      const hasPrice = x.price > 0;
-      const hasImage = !!x.coverImageUrl;
-
-      return hasTitle || hasPrice || hasImage;
-    }) ?? [];
+  const visibleItems = items.filter(x => {
+    if (x.status !== 0) return true;
+  
+    const hasTitle = x.title?.trim().length > 0;
+    const hasPrice = x.price > 0;
+    const hasImage = !!x.coverImageUrl;
+  
+    return hasTitle || hasPrice || hasImage;
+  });
+  
 
   return (
     <Container>

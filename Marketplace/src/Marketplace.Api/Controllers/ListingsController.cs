@@ -1,10 +1,12 @@
 ﻿using Marketplace.Api.Common;
 using Marketplace.Application.Common.Interfaces;
+using Marketplace.Application.Common.Results;
 using Marketplace.Application.Features.Listings.Commands.AddListingImage;
 using Marketplace.Application.Features.Listings.Commands.BumpListing;
 using Marketplace.Application.Features.Listings.Commands.CreateListing;
-using Marketplace.Application.Features.Listings.Commands.PublishListing;
+//using Marketplace.Application.Features.Listings.Commands.PublishListing;
 using Marketplace.Application.Features.Listings.Commands.SetListingCoverImage;
+using Marketplace.Application.Features.Listings.Commands.SubmitForReview;
 using Marketplace.Application.Features.Listings.Commands.UpdateDraftListing;
 using Marketplace.Application.Features.Listings.Commands.UpdateListingBasics;
 using Marketplace.Application.Features.Listings.Queries.GetListingById;
@@ -12,6 +14,7 @@ using Marketplace.Application.Features.Listings.Queries.GetListingDetails;
 using Marketplace.Application.Features.Listings.Queries.GetListingForEdit;
 using Marketplace.Application.Features.Listings.Queries.SearchListings;
 using Marketplace.Application.Features.Listings.Queries.SearchListingsV2;
+using Marketplace.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -60,6 +63,7 @@ public sealed class ListingsController : ApiControllerBase
 
         return FromResult(result);
     }
+
 
     public sealed record UpdateDraftListingRequest(
     Guid CategoryId,
@@ -111,6 +115,17 @@ public sealed class ListingsController : ApiControllerBase
         return FromResult(result);
     }
 
+    //[HttpPost("{id:guid}/submit")]
+    //public async Task<IActionResult> Submit(Guid id, CancellationToken ct)
+    //{
+    //    var sellerId = CurrentUser.Id(User);
+
+    //    var result = await _mediator.Send(
+    //        new SubmitListingForReviewCommand(id, sellerId),
+    //        ct);
+
+    //    return FromResult(result);
+    //}
 
     [AllowAnonymous]
     [HttpGet("search-v2")]
@@ -362,16 +377,16 @@ public sealed class ListingsController : ApiControllerBase
         return FromResult(result);
     }
 
-    [HttpPost("{id:guid}/publish")]
-    public async Task<IActionResult> Publish(Guid id, CancellationToken ct)
-    {
-        var sellerId = CurrentUser.Id(User);
+    //[Authorize(Roles = AppRoles.Admin)]
+    //public async Task<IActionResult> Publish(Guid id, CancellationToken ct)
+    //{
+    //    var sellerId = CurrentUser.Id(User);
 
-        var result = await _mediator.Send(
-            new PublishListingCommand(id, sellerId),
-            ct);
+    //    var result = await _mediator.Send(
+    //        new PublishListingCommand(id, sellerId),
+    //        ct);
 
-        return FromResult(result);
-    }
+    //    return FromResult(result);
+    //}
 
 }

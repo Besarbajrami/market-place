@@ -8,9 +8,11 @@ namespace Marketplace.Domain.Enums
     public enum ListingStatus
     {
         Draft = 0,
-        Published = 1,
-        Sold = 2,
-        Archived = 3
+        PendingReview = 1,
+        Published = 2,
+        Sold = 3,
+        Archived = 4
     }
+
 
 }

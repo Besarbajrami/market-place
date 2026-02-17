@@ -14,6 +14,7 @@ import { AdminRoute } from "../../auth/AdminRoute";
 import { AdminCategoriesPage } from "../../features/categories/AdminCategoriesPage";
 import { SellerPage } from "../../features/users/SellerPage";
 import { QuickCreateListingPage } from "../../features/listings/CreateListingQuickPage";
+import { AdminPendingListingsPage } from "../../features/admin/listings/AdminPendingListingsPage";
 
 export const router = createBrowserRouter([
   {
@@ -88,7 +89,16 @@ export const router = createBrowserRouter([
       {
         path: "seller/:sellerId",
         element: <SellerPage />
-      }
+      },
+
+      {
+        path: "/admin/listings/pending",
+        element:    <AdminRoute>
+        <AdminPendingListingsPage />
+      </AdminRoute>
+      },
+
+
       
       
       

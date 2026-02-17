@@ -25,7 +25,7 @@ namespace Marketplace.Application.Features.Listings.Commands
             var listing = await _repo.GetByIdAsync(request.ListingId, ct);
             if (listing is null)
             return Result<BumpListingResponse>.Failure(ListingErrors.Forbidden);
-            listing.Approve();
+            listing.ApproveAndPublish();
             await _uow.SaveChangesAsync(ct);
 
             return Result.Success();

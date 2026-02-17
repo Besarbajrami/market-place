@@ -74,7 +74,7 @@ public sealed class ListingRepository : IListingRepository
 
         // Only published
         q = q.Where(l => l.Status == ListingStatus.Published);
-        q = q.Where(l => l.ModerationStatus != ModerationStatus.Hidden);
+        q = q.Where(l => l.ModerationStatus == ModerationStatus.Approved);
 
         if (!string.IsNullOrWhiteSpace(spec.Query))
         {
@@ -178,13 +178,37 @@ public sealed class ListingRepository : IListingRepository
     }
     public Task<bool> IsPublishedAsync(Guid listingId, CancellationToken ct = default)
     {
-        return _db.Listings.AnyAsync(l => l.Id == listingId && l.Status == ListingStatus.Published, ct);
+        return _db.Listings.AnyAsync(l =>
+            l.Id == listingId &&
+            l.Status == ListingStatus.Published &&
+            l.ModerationStatus == ModerationStatus.Approved,
+            ct);
+    }
+    public async Task<(IReadOnlyList<Listing> Items, int TotalCount)>
+    SearchPendingAsync(int page, int pageSize, CancellationToken ct = default)
+    {
+        var q = _db.Listings
+            .Where(l => l.Status == ListingStatus.PendingReview)
+            .OrderByDescending(l => l.CreatedAt);
+
+        var total = await q.CountAsync(ct);
+
+        var items = await q
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Include(l => l.Images)
+            .ToListAsync(ct);
+
+        return (items, total);
     }
 
     public async Task<ListingSearchRow?> GetSearchRowAsync(Guid listingId, CancellationToken ct = default)
     {
         return await _db.Listings
-            .Where(l => l.Id == listingId && l.Status == ListingStatus.Published)
+.Where(l =>
+    l.Id == listingId &&
+    l.Status == ListingStatus.Published &&
+    l.ModerationStatus == ModerationStatus.Approved)
             .Select(l => new ListingSearchRow(
                 l.Id,
                 l.Title,
@@ -350,12 +374,12 @@ l.LocationCountryCode
 
         return (items, total);
     }
-    public async Task<Listing?> GetForPublishAsync(Guid listingId, CancellationToken ct = default)
-    {
-        return await _db.Listings
-            .Include(l => l.Images)
-            .FirstOrDefaultAsync(l => l.Id == listingId, ct);
-    }
+    //public async Task<Listing?> GetForPublishAsync(Guid listingId, CancellationToken ct = default)
+    //{
+    //    return await _db.Listings
+    //        .Include(l => l.Images)
+    //        .FirstOrDefaultAsync(l => l.Id == listingId, ct);
+    //}
     public Task<Listing?> GetByIdWithAttributesAsync(
     Guid listingId,
     CancellationToken ct = default)

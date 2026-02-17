@@ -19,10 +19,12 @@ public interface IListingRepository
     CancellationToken ct = default);
     Task<bool> IsPublishedAsync(Guid listingId, CancellationToken ct = default);
     Task<ListingSearchRow?> GetSearchRowAsync(Guid listingId, CancellationToken ct = default);
-    Task<Listing?> GetForPublishAsync(Guid listingId, CancellationToken ct = default);
+    //Task<Listing?> GetForPublishAsync(Guid listingId, CancellationToken ct = default);
     Task<Listing?> GetByIdWithAttributesAsync(
     Guid listingId,
     CancellationToken ct = default);
+    Task<(IReadOnlyList<Listing> Items, int TotalCount)>
+    SearchPendingAsync(int page, int pageSize, CancellationToken ct = default);
 
     Task<Guid?> GetSellerIdAsync(Guid listingId, CancellationToken ct = default);
     Task<Listing?> GetByIdWithImagesAsync(Guid id, CancellationToken ct = default);
