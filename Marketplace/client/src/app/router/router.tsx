@@ -93,9 +93,15 @@ export const router = createBrowserRouter([
 
       {
         path: "/admin/listings/pending",
-        element:    <AdminRoute>
-        <AdminPendingListingsPage />
-      </AdminRoute>
+        element:   
+
+        (
+          <AdminRoute>
+            <AdminPendingListingsPage />
+          </AdminRoute>
+        )
+
+   
       },
 
 
