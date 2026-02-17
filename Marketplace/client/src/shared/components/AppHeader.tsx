@@ -191,6 +191,18 @@ function NavLinks({
           Admin
         </Link>
       )}
+            {isAdmin && (
+        <Link
+          to="/admin/listings/pending"
+          style={{
+            ...linkStyle,
+            color: "var(--primary)",
+            fontWeight: 600
+          }}
+        >
+          Admin-Pending
+        </Link>
+      )}
     </>
   );
 }
