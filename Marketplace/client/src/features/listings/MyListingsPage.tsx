@@ -186,7 +186,7 @@ export function MyListingsPage() {
                       {t("common.Delete")}
                     </button>
 
-                    <button
+                    {/* <button
                       onClick={() => publish.mutate(x.id)}
                       disabled={x.status !== 0}
                       style={{
@@ -208,7 +208,7 @@ export function MyListingsPage() {
                       }}
                     >
                       {t("common.Publish")}
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </Card>
