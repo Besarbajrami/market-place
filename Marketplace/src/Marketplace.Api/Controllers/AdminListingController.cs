@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Marketplace.Api.Controllers;
 
 [Route("api/admin/listings")]
-[Authorize(Roles = AppRoles.Admin)]
+[Authorize(Policy = "AdminOnly")]
 
 public sealed class AdminListingsController : ApiControllerBase
 {
