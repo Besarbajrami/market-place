@@ -4,6 +4,7 @@ import {
   useApproveListing,
   useRejectListing
 } from "../../../api/admin/listings/useAdminPendingListings";
+import { AdminPendingCard } from "../components/AdminPendingCard";
 
 export function AdminPendingListingsPage() {
   const [page, setPage] = useState(1);
@@ -45,71 +46,16 @@ export function AdminPendingListingsPage() {
           overflow: "hidden"
         }}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "#f6f7f9" }}>
-              <th style={th}>Title</th>
-              <th style={th}>Seller</th>
-              <th style={th}>Created</th>
-              <th style={th}>Images</th>
-              <th style={th}>Actions</th>
-            </tr>
-          </thead>
+   <div style={{ display: "grid", gap: 16 }}>
+  {(data?.items ?? []).map(item => (
+    <AdminPendingCard key={item.id} listing={item} />
+  ))}
 
-          <tbody>
-            {(data?.items ?? []).map(item => (
-              <tr key={item.id} style={{ borderTop: "1px solid #eee" }}>
-                <td style={td}>
-                  <div style={{ fontWeight: 700 }}>{item.title || "(no title)"}</div>
-                  <div style={{ fontSize: 12, color: "#666" }}>{item.id}</div>
-                </td>
+  {data?.items?.length === 0 && (
+    <div>No pending listings 🎉</div>
+  )}
+</div>
 
-                <td style={td}>
-                  <div style={{ fontFamily: "monospace", fontSize: 12 }}>
-                    {item.sellerId}
-                  </div>
-                </td>
-
-                <td style={td}>
-                  {new Date(item.createdAt).toLocaleString()}
-                </td>
-
-                <td style={td}>{item.imageCount}</td>
-
-                <td style={td}>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button
-                      onClick={() => approve.mutate(item.id)}
-                      disabled={approve.isPending || reject.isPending}
-                      style={btnPrimary}
-                    >
-                      {approve.isPending ? "Approving…" : "Approve"}
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setRejectModal({ open: true, listingId: item.id, title: item.title });
-                        setRejectReason("");
-                      }}
-                      disabled={approve.isPending || reject.isPending}
-                      style={btnDanger}
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-
-            {data?.items?.length === 0 && (
-              <tr>
-                <td style={{ padding: 16 }} colSpan={5}>
-                  No pending listings 🎉
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
       </div>
 
       {/* Pagination */}
