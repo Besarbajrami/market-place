@@ -29,9 +29,50 @@ export function ConversationPage() {
           localStorage.getItem("mp_access_token") ?? ""
       })
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Information) // 👈 (optional but very helpful)
       .build();
   
     let isMounted = true;
+  
+    // 👇 register handlers BEFORE start (so they survive reconnects)
+    connection.on("message:new", (message) => {
+      qc.setQueryData(
+        ["conversation-messages", conversationId, 50],
+        (old: any) => {
+          if (!old || !old.items) {
+            return { items: [message] };
+          }
+  
+          if (old.items.some((m: any) => m.id === message.id)) {
+            return old;
+          }
+  
+          return {
+            ...old,
+            items: [...old.items, message],
+          };
+        }
+      );
+    });
+  
+    // 🔥 NEW: when SignalR reconnects (common on mobile), re-join the group
+    connection.onreconnected(async () => {
+      try {
+        if (!isMounted) return;
+        console.log("SignalR reconnected, rejoining conversation...");
+        await connection.invoke("JoinConversation", conversationId);
+      } catch (err) {
+        console.error("Failed to rejoin conversation after reconnect:", err);
+      }
+    });
+  
+    connection.onreconnecting((err) => {
+      console.log("SignalR reconnecting...", err);
+    });
+  
+    connection.onclose((err) => {
+      console.log("SignalR closed", err);
+    });
   
     async function start() {
       try {
@@ -39,27 +80,8 @@ export function ConversationPage() {
   
         if (!isMounted) return;
   
+        console.log("SignalR connected, joining conversation...");
         await connection.invoke("JoinConversation", conversationId);
-  
-        connection.on("message:new", (message) => {
-          qc.setQueryData(
-            ["conversation-messages", conversationId, 50],
-            (old: any) => {
-              if (!old || !old.items) {
-                return { items: [message] };
-              }
-  
-              if (old.items.some((m: any) => m.id === message.id)) {
-                return old;
-              }
-  
-              return {
-                ...old,
-                items: [...old.items, message],
-              };
-            }
-          );
-        });
       } catch (err) {
         console.error("SignalR connection error:", err);
       }
@@ -69,9 +91,10 @@ export function ConversationPage() {
   
     return () => {
       isMounted = false;
-      connection.stop(); // 🔥 CRITICAL — clean disconnect
+      connection.stop();
     };
   }, [conversationId, qc]);
+  
   
 
   // ✅ Auto scroll
