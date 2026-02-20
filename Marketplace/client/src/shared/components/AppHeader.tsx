@@ -15,16 +15,16 @@ export function AppHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        background: "var(--surface)",
-        borderBottom: "1px solid var(--border)",
-        boxShadow: "var(--shadow-sm)"
-      }}
-    >
+<header
+  style={{
+    position: "sticky",
+    top: 0,
+    zIndex: 1000,
+    background: "var(--surface)",
+    borderBottom: "1px solid var(--border)",
+    boxShadow: "var(--shadow-sm)",
+  }}
+>
       <div
         style={{
           maxWidth: 1200,
@@ -52,7 +52,9 @@ export function AppHeader() {
         {/* RIGHT SIDE */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {/* Language + Theme */}
-          <LanguageSwitcher compact />
+          <div style={{ color: "var(--text-primary)" }}>
+  <LanguageSwitcher compact />
+</div>
           <ThemeToggle />
 
           {/* Desktop Nav */}
