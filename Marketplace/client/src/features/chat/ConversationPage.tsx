@@ -29,16 +29,17 @@ export function ConversationPage() {
           localStorage.getItem("mp_access_token") ?? ""
       })
       .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Information)
       .build();
   
     connection.on("message:new", (message) => {
+      console.log("MESSAGE RECEIVED:", message);
+  
       qc.setQueryData(
         ["conversation-messages", conversationId, 50],
         (old: any) => {
-          if (!old || !old.items) {
-            return { items: [message] };
-          }
+          if (!old) return { items: [message] };
+  
+          if (!old.items) return { ...old, items: [message] };
   
           if (old.items.some((m: any) => m.id === message.id)) {
             return old;
