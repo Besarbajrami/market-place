@@ -5,10 +5,6 @@ import { LanguageSwitcher } from "../../i18n/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "../../features/hooks/ThemeToggle";
 
-/* =========================================================
-   APP HEADER
-========================================================= */
-
 export function AppHeader() {
   const { t } = useTranslation();
   const { isAuthenticated, user, logout, isAdmin } = useAuth();
@@ -25,7 +21,7 @@ export function AppHeader() {
         boxShadow: "var(--shadow-sm)"
       }}
     >
-      <div className="header-inner">
+      <div className="header-container">
         {/* TOP ROW — LOGO */}
         <div className="header-top">
           <Link
@@ -41,13 +37,22 @@ export function AppHeader() {
           </Link>
         </div>
 
-        {/* BOTTOM ROW — CONTROLS */}
+        {/* BOTTOM ROW */}
         <div className="header-bottom">
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* LEFT — HAMBURGER */}
+          <button
+            onClick={() => setOpen(o => !o)}
+            className="mobile-only"
+            style={iconButton}
+          >
+            {open ? "✕" : "☰"}
+          </button>
+
+          {/* RIGHT — CONTROLS */}
+          <div className="header-controls">
             <div style={{ color: "var(--text-primary)" }}>
               <LanguageSwitcher compact />
             </div>
-
             <ThemeToggle />
 
             {/* Desktop Nav */}
@@ -71,12 +76,7 @@ export function AppHeader() {
                 </>
               ) : (
                 <>
-                  <span
-                    style={{
-                      fontSize: 13,
-                      color: "var(--text-secondary)"
-                    }}
-                  >
+                  <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
                     {user?.email}
                   </span>
                   <button onClick={logout} style={ghostButton}>
@@ -85,23 +85,6 @@ export function AppHeader() {
                 </>
               )}
             </div>
-
-            {/* Mobile Hamburger */}
-            <button
-              onClick={() => setOpen(o => !o)}
-              className="mobile-only"
-              style={{
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "1px solid var(--border)",
-                background: "var(--surface)",
-                color: "var(--text-primary)",
-                fontSize: 18,
-                cursor: "pointer"
-              }}
-            >
-              {open ? "✕" : "☰"}
-            </button>
           </div>
         </div>
       </div>
@@ -127,7 +110,7 @@ export function AppHeader() {
       )}
 
       <style>{`
-        .header-inner {
+        .header-container {
           max-width: 1200px;
           margin: 0 auto;
           padding: 14px 20px;
@@ -143,7 +126,14 @@ export function AppHeader() {
 
         .header-bottom {
           display: flex;
-          justify-content: center;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .header-controls {
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
 
         .desktop-nav {
@@ -156,7 +146,7 @@ export function AppHeader() {
         }
 
         @media (min-width: 769px) {
-          .header-inner {
+          .header-container {
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
@@ -185,9 +175,7 @@ export function AppHeader() {
   );
 }
 
-/* =========================================================
-   NAV LINKS
-========================================================= */
+/* NAV LINKS */
 
 function NavLinks({
   isAuthenticated,
@@ -228,28 +216,18 @@ function NavLinks({
       </Link>
 
       {isAdmin && (
-        <>
-          <Link
-            to="/admin/categories"
-            style={{ ...linkStyle, color: "var(--primary)", fontWeight: 600 }}
-          >
-            Admin
-          </Link>
-          <Link
-            to="/admin/listings/pending"
-            style={{ ...linkStyle, color: "var(--primary)", fontWeight: 600 }}
-          >
-            Admin-Pending
-          </Link>
-        </>
+        <Link
+          to="/admin/categories"
+          style={{ ...linkStyle, color: "var(--primary)", fontWeight: 600 }}
+        >
+          Admin
+        </Link>
       )}
     </>
   );
 }
 
-/* =========================================================
-   MOBILE MENU
-========================================================= */
+/* MOBILE MENU */
 
 function MobileMenu({
   isAuthenticated,
@@ -257,13 +235,7 @@ function MobileMenu({
   logout,
   userEmail,
   close
-}: {
-  isAuthenticated: boolean;
-  isAdmin: boolean;
-  logout: () => void;
-  userEmail?: string;
-  close: () => void;
-}) {
+}: any) {
   const { t } = useTranslation();
 
   const mobileLink: React.CSSProperties = {
@@ -303,16 +275,6 @@ function MobileMenu({
         {t("common.Favorites")}
       </Link>
 
-      {isAdmin && (
-        <Link
-          to="/admin/categories"
-          onClick={close}
-          style={{ ...mobileLink, color: "var(--primary)" }}
-        >
-          Admin
-        </Link>
-      )}
-
       {!isAuthenticated ? (
         <>
           <Link to="/login" onClick={close} style={mobileLink}>
@@ -328,10 +290,7 @@ function MobileMenu({
             logout();
             close();
           }}
-          style={{
-            ...mobileLink,
-            cursor: "pointer"
-          }}
+          style={{ ...mobileLink, cursor: "pointer" }}
         >
           {t("common.Logout")}
         </button>
@@ -340,9 +299,17 @@ function MobileMenu({
   );
 }
 
-/* =========================================================
-   BUTTON STYLES
-========================================================= */
+/* BUTTONS */
+
+const iconButton: React.CSSProperties = {
+  padding: "8px 12px",
+  borderRadius: 8,
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  color: "var(--text-primary)",
+  fontSize: 18,
+  cursor: "pointer"
+};
 
 const ghostButton: React.CSSProperties = {
   padding: "8px 12px",
