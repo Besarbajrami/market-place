@@ -15,95 +15,94 @@ export function AppHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-<header
-  style={{
-    position: "sticky",
-    top: 0,
-    zIndex: 1000,
-    background: "var(--surface)",
-    borderBottom: "1px solid var(--border)",
-    boxShadow: "var(--shadow-sm)",
-  }}
->
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "14px 20px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12
-        }}
-      >
-        {/* LOGO */}
-        <Link
-          to="/"
-          style={{
-            fontWeight: 900,
-            fontSize: 20,
-            color: "var(--text-primary)",
-            textDecoration: "none"
-          }}
-        >
-          ◈ Marketplace
-        </Link>
-
-        {/* RIGHT SIDE */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {/* Language + Theme */}
-          <div style={{ color: "var(--text-primary)" }}>
-  <LanguageSwitcher compact />
-</div>
-          <ThemeToggle />
-
-          {/* Desktop Nav */}
-          <nav className="desktop-nav">
-            <NavLinks
-              isAuthenticated={isAuthenticated}
-              isAdmin={isAdmin}
-            />
-          </nav>
-
-          {/* Desktop Auth */}
-          <div className="desktop-nav" style={{ display: "flex", gap: 8 }}>
-            {!isAuthenticated ? (
-              <>
-                <Link to="/login" style={ghostButton}>
-                  {t("common.Login")}
-                </Link>
-                <Link to="/register" style={primaryButton}>
-                  {t("common.Register")}
-                </Link>
-              </>
-            ) : (
-              <>
-                <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-                  {user?.email}
-                </span>
-                <button onClick={logout} style={ghostButton}>
-                  {t("common.Logout")}
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Hamburger */}
-          <button
-            onClick={() => setOpen(o => !o)}
-            className="mobile-only"
+    <header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
+        background: "var(--surface)",
+        borderBottom: "1px solid var(--border)",
+        boxShadow: "var(--shadow-sm)"
+      }}
+    >
+      <div className="header-inner">
+        {/* TOP ROW — LOGO */}
+        <div className="header-top">
+          <Link
+            to="/"
             style={{
-              padding: "8px 12px",
-              borderRadius: 8,
-              border: "1px solid var(--border)",
-              background: "var(--surface)",
+              fontWeight: 900,
+              fontSize: 20,
               color: "var(--text-primary)",
-              fontSize: 18,
-              cursor: "pointer"
+              textDecoration: "none"
             }}
           >
-            {open ? "✕" : "☰"}
-          </button>
+            ◈ Marketplace
+          </Link>
+        </div>
+
+        {/* BOTTOM ROW — CONTROLS */}
+        <div className="header-bottom">
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ color: "var(--text-primary)" }}>
+              <LanguageSwitcher compact />
+            </div>
+
+            <ThemeToggle />
+
+            {/* Desktop Nav */}
+            <nav className="desktop-nav">
+              <NavLinks
+                isAuthenticated={isAuthenticated}
+                isAdmin={isAdmin}
+              />
+            </nav>
+
+            {/* Desktop Auth */}
+            <div className="desktop-nav" style={{ display: "flex", gap: 8 }}>
+              {!isAuthenticated ? (
+                <>
+                  <Link to="/login" style={ghostButton}>
+                    {t("common.Login")}
+                  </Link>
+                  <Link to="/register" style={primaryButton}>
+                    {t("common.Register")}
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <span
+                    style={{
+                      fontSize: 13,
+                      color: "var(--text-secondary)"
+                    }}
+                  >
+                    {user?.email}
+                  </span>
+                  <button onClick={logout} style={ghostButton}>
+                    {t("common.Logout")}
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Mobile Hamburger */}
+            <button
+              onClick={() => setOpen(o => !o)}
+              className="mobile-only"
+              style={{
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                color: "var(--text-primary)",
+                fontSize: 18,
+                cursor: "pointer"
+              }}
+            >
+              {open ? "✕" : "☰"}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -113,7 +112,8 @@ export function AppHeader() {
           className="mobile-only"
           style={{
             borderTop: "1px solid var(--border)",
-            background: "var(--surface)"
+            background: "var(--surface)",
+            boxShadow: "0 8px 20px rgba(0,0,0,0.15)"
           }}
         >
           <MobileMenu
@@ -127,12 +127,58 @@ export function AppHeader() {
       )}
 
       <style>{`
-        .desktop-nav { display: flex; gap: 8px; }
-        .mobile-only { display: none; }
+        .header-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 14px 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .header-top {
+          display: flex;
+          justify-content: center;
+        }
+
+        .header-bottom {
+          display: flex;
+          justify-content: center;
+        }
+
+        .desktop-nav {
+          display: flex;
+          gap: 8px;
+        }
+
+        .mobile-only {
+          display: none;
+        }
+
+        @media (min-width: 769px) {
+          .header-inner {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+          }
+
+          .header-top {
+            justify-content: flex-start;
+          }
+
+          .header-bottom {
+            justify-content: flex-end;
+          }
+        }
 
         @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-only { display: block !important; }
+          .desktop-nav {
+            display: none !important;
+          }
+
+          .mobile-only {
+            display: block !important;
+          }
         }
       `}</style>
     </header>
@@ -182,28 +228,20 @@ function NavLinks({
       </Link>
 
       {isAdmin && (
-        <Link
-          to="/admin/categories"
-          style={{
-            ...linkStyle,
-            color: "var(--primary)",
-            fontWeight: 600
-          }}
-        >
-          Admin
-        </Link>
-      )}
-            {isAdmin && (
-        <Link
-          to="/admin/listings/pending"
-          style={{
-            ...linkStyle,
-            color: "var(--primary)",
-            fontWeight: 600
-          }}
-        >
-          Admin-Pending
-        </Link>
+        <>
+          <Link
+            to="/admin/categories"
+            style={{ ...linkStyle, color: "var(--primary)", fontWeight: 600 }}
+          >
+            Admin
+          </Link>
+          <Link
+            to="/admin/listings/pending"
+            style={{ ...linkStyle, color: "var(--primary)", fontWeight: 600 }}
+          >
+            Admin-Pending
+          </Link>
+        </>
       )}
     </>
   );
@@ -234,7 +272,8 @@ function MobileMenu({
     textDecoration: "none",
     color: "var(--text-primary)",
     border: "1px solid var(--border)",
-    display: "block"
+    display: "block",
+    background: "var(--surface)"
   };
 
   return (
@@ -291,8 +330,7 @@ function MobileMenu({
           }}
           style={{
             ...mobileLink,
-            cursor: "pointer",
-            background: "transparent"
+            cursor: "pointer"
           }}
         >
           {t("common.Logout")}
