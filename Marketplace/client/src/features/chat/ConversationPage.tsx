@@ -31,44 +31,47 @@ export function ConversationPage() {
       .withAutomaticReconnect()
       .build();
   
-    connection.on("message:new", (message) => {
-      console.log("MESSAGE RECEIVED:", message);
-  
-      qc.setQueryData(
-        ["conversation-messages", conversationId, 50],
-        (old: any) => {
-          if (!old) return { items: [message] };
-  
-          if (!old.items) return { ...old, items: [message] };
-  
-          if (old.items.some((m: any) => m.id === message.id)) {
-            return old;
-          }
-  
-          return {
-            ...old,
-            items: [...old.items, message],
-          };
-        }
-      );
-    });
-  
-    connection.onreconnected(async () => {
-      await connection.invoke("JoinConversation", conversationId);
-    });
+    let isMounted = true;
   
     async function start() {
-      await connection.start();
-      await connection.invoke("JoinConversation", conversationId);
+      try {
+        await connection.start();
+  
+        if (!isMounted) return;
+  
+        await connection.invoke("JoinConversation", conversationId);
+  
+        connection.on("message:new", (message) => {
+          qc.setQueryData(
+            ["conversation-messages", conversationId, 50],
+            (old: any) => {
+              if (!old || !old.items) {
+                return { items: [message] };
+              }
+  
+              if (old.items.some((m: any) => m.id === message.id)) {
+                return old;
+              }
+  
+              return {
+                ...old,
+                items: [...old.items, message],
+              };
+            }
+          );
+        });
+      } catch (err) {
+        console.error("SignalR connection error:", err);
+      }
     }
   
     start();
   
     return () => {
-      connection.stop();
+      isMounted = false;
+      connection.stop(); // 🔥 CRITICAL — clean disconnect
     };
   }, [conversationId, qc]);
-  
   
 
   // ✅ Auto scroll

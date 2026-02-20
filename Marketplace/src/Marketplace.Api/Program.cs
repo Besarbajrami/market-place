@@ -188,7 +188,12 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 // --------------------------------------------------
 // SIGNALR & CORS
 // --------------------------------------------------
-builder.Services.AddSignalR();
+// before: builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
+
 
 builder.Services.AddCors(options =>
 {
