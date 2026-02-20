@@ -29,71 +29,31 @@ export function ConversationPage() {
           localStorage.getItem("mp_access_token") ?? ""
       })
       .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Information) // 👈 (optional but very helpful)
+      .configureLogging(signalR.LogLevel.Information)
       .build();
   
-    let isMounted = true;
-  
-    // 👇 register handlers BEFORE start (so they survive reconnects)
     connection.on("message:new", (message) => {
-      qc.setQueryData(
-        ["conversation-messages", conversationId, 50],
-        (old: any) => {
-          if (!old || !old.items) {
-            return { items: [message] };
-          }
-  
-          if (old.items.some((m: any) => m.id === message.id)) {
-            return old;
-          }
-  
-          return {
-            ...old,
-            items: [...old.items, message],
-          };
-        }
-      );
+      console.log("MESSAGE RECEIVED:", message);
+      // update cache...
     });
   
-    // 🔥 NEW: when SignalR reconnects (common on mobile), re-join the group
     connection.onreconnected(async () => {
-      try {
-        if (!isMounted) return;
-        console.log("SignalR reconnected, rejoining conversation...");
-        await connection.invoke("JoinConversation", conversationId);
-      } catch (err) {
-        console.error("Failed to rejoin conversation after reconnect:", err);
-      }
-    });
-  
-    connection.onreconnecting((err) => {
-      console.log("SignalR reconnecting...", err);
-    });
-  
-    connection.onclose((err) => {
-      console.log("SignalR closed", err);
+      console.log("Reconnected — rejoining group");
+      await connection.invoke("JoinConversation", conversationId);
     });
   
     async function start() {
-      try {
-        await connection.start();
-  
-        if (!isMounted) return;
-  
-        console.log("SignalR connected, joining conversation...");
-        await connection.invoke("JoinConversation", conversationId);
-      } catch (err) {
-        console.error("SignalR connection error:", err);
-      }
+      await connection.start();
+      console.log("Connected — joining group");
+      await connection.invoke("JoinConversation", conversationId);
     }
   
     start();
   
     return () => {
-      isMounted = false;
       connection.stop();
     };
-  }, [conversationId, qc]);
+  }, [conversationId]);
   
   
 
