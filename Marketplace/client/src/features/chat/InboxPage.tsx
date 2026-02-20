@@ -24,20 +24,24 @@ export function InboxPage() {
 
       <div style={{ marginTop: 16, display: "grid", gap: 10 }}>
         {data?.items.map((c) => (
-          <div
-            key={c.conversationId}
-            onClick={() => nav(`/inbox/${c.conversationId}`)}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: 10,
-              padding: 12,
-              cursor: "pointer",
-              background: c.unreadCount > 0 ? "#f0f7ff" : "white",
-              display: "flex",
-              gap: 12,
-              alignItems: "center"
-            }}
-          >
+ <div
+ key={c.conversationId}
+ onClick={() => nav(`/inbox/${c.conversationId}`)}
+ style={{
+   border: "1px solid var(--border)",
+   borderRadius: 10,
+   padding: 12,
+   cursor: "pointer",
+   background:
+     c.unreadCount > 0
+       ? "var(--surface-highlight)"
+       : "var(--surface)",
+   color: "var(--text)",
+   display: "flex",
+   gap: 12,
+   alignItems: "center"
+ }}
+>
             {/* LISTING IMAGE */}
             {c.coverImageUrl ? (
               <img
@@ -57,7 +61,7 @@ export function InboxPage() {
                   width: 72,
                   height: 72,
                   borderRadius: 8,
-                  background: "#eee",
+                  background: "var(--surface-2)",
                   flexShrink: 0
                 }}
               />
@@ -83,7 +87,7 @@ export function InboxPage() {
               <div
                 style={{
                   fontSize: 13,
-                  opacity: 0.7,
+                 color: "var(--text-muted)",
                   marginTop: 4,
                   whiteSpace: "nowrap",
                   overflow: "hidden",
@@ -99,7 +103,7 @@ export function InboxPage() {
               style={{
                 textAlign: "right",
                 fontSize: 12,
-                opacity: 0.7,
+              color: "var(--text-muted)",
                 minWidth: 90
               }}
             >
@@ -136,12 +140,21 @@ export function InboxPage() {
             alignItems: "center"
           }}
         >
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
-          >
-            Prev
-          </button>
+      <button
+  onClick={() => setPage((p) => Math.max(1, p - 1))}
+  disabled={page <= 1}
+  style={{
+    padding: "6px 12px",
+    borderRadius: 8,
+    border: "1px solid var(--border)",
+    background: "var(--surface)",
+    color: "var(--text)",
+    cursor: "pointer",
+    opacity: page <= 1 ? 0.5 : 1
+  }}
+>
+  Prev
+</button>
 
           <span>
             Page {page} / {totalPages}
