@@ -33,18 +33,31 @@ export function ConversationPage() {
       .build();
   
     connection.on("message:new", (message) => {
-      console.log("MESSAGE RECEIVED:", message);
-      // update cache...
+      qc.setQueryData(
+        ["conversation-messages", conversationId, 50],
+        (old: any) => {
+          if (!old || !old.items) {
+            return { items: [message] };
+          }
+  
+          if (old.items.some((m: any) => m.id === message.id)) {
+            return old;
+          }
+  
+          return {
+            ...old,
+            items: [...old.items, message],
+          };
+        }
+      );
     });
   
     connection.onreconnected(async () => {
-      console.log("Reconnected — rejoining group");
       await connection.invoke("JoinConversation", conversationId);
     });
   
     async function start() {
       await connection.start();
-      console.log("Connected — joining group");
       await connection.invoke("JoinConversation", conversationId);
     }
   
@@ -53,7 +66,7 @@ export function ConversationPage() {
     return () => {
       connection.stop();
     };
-  }, [conversationId]);
+  }, [conversationId, qc]);
   
   
 
