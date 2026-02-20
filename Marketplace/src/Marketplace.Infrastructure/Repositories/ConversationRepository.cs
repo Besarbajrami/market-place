@@ -40,10 +40,10 @@ public sealed class ConversationRepository : IConversationRepository
 
     public Task<bool> IsParticipantAsync(Guid conversationId, Guid userId, CancellationToken ct = default)
     {
-        return _db.Conversations.AnyAsync(
-            c => c.Id == conversationId && (c.SellerId == userId || c.BuyerId == userId),
-            ct);
+        return _db.ConversationParticipants
+            .AnyAsync(p => p.ConversationId == conversationId && p.UserId == userId, ct);
     }
+
     public async Task TouchAsync(Guid conversationId, DateTime now, CancellationToken ct)
     {
         await _db.Conversations
