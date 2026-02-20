@@ -1,11 +1,9 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { useMessages, useSendMessage } from "./useChat";
-import { useAuth } from "../../auth/useAuth";
-import { useConversationHeader } from "./useChat";
-import { useNavigate } from "react-router-dom";
 import * as signalR from "@microsoft/signalr";
 import { useQueryClient } from "@tanstack/react-query";
+import { useMessages, useSendMessage, useConversationHeader } from "./useChat";
+import { useAuth } from "../../auth/useAuth";
 
 export function ConversationPage() {
   const { id } = useParams<{ id: string }>();
@@ -13,68 +11,85 @@ export function ConversationPage() {
   const { user } = useAuth();
   const { data, isLoading } = useMessages(conversationId, 50);
   const send = useSendMessage(conversationId);
-  const [text, setText] = useState("");
-  const bottomRef = useRef<HTMLDivElement | null>(null);
   const header = useConversationHeader(conversationId);
   const nav = useNavigate();
+  const [text, setText] = useState("");
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const connectionRef = useRef<signalR.HubConnection | null>(null);
   const qc = useQueryClient();
 
-  // ✅ SignalR realtime handling
+  // 🔑 This MUST match useMessages' queryKey
+  const messagesQueryKey = ["conversation-messages", conversationId, 50];
+
   useEffect(() => {
     if (!conversationId) return;
-  
+    if (connectionRef.current) return; // already connected
+
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl("/hubs/chat", {
+      .withUrl("https://localhost:7012/hubs/chat", {
         accessTokenFactory: () =>
           localStorage.getItem("mp_access_token") ?? ""
       })
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Information)
       .build();
-  
-    let isMounted = true;
-  
+
+    connectionRef.current = connection;
+
+    // ✅ Register handlers BEFORE start
+    connection.on("message:new", (message) => {
+      console.log("MESSAGE RECEIVED", message);
+    
+      qc.invalidateQueries({
+        queryKey: ["conversation-messages", conversationId, 50]
+      });
+    });
+
+    connection.on("presence:online", (payload: any) => {
+      console.log("presence online", payload);
+    });
+
+    connection.on("presence:offline", (payload: any) => {
+      console.log("presence offline", payload);
+    });
+
+    connection.on("conversation:updated", (payload) => {
+      if (payload.conversationId === conversationId) {
+        qc.invalidateQueries({
+          queryKey: ["conversation-messages", conversationId, 50]
+        });
+      }
+    });
+
     async function start() {
       try {
         await connection.start();
-  
-        if (!isMounted) return;
-  
+        console.log("SignalR connected, invoking JoinConversation", conversationId);
         await connection.invoke("JoinConversation", conversationId);
-  
-        connection.on("message:new", (message) => {
-          qc.setQueryData(
-            ["conversation-messages", conversationId, 50],
-            (old: any) => {
-              if (!old || !old.items) {
-                return { items: [message] };
-              }
-  
-              if (old.items.some((m: any) => m.id === message.id)) {
-                return old;
-              }
-  
-              return {
-                ...old,
-                items: [...old.items, message],
-              };
-            }
-          );
-        });
+        console.log("JoinConversation invoked OK");
       } catch (err) {
-        console.error("SignalR connection error:", err);
+        console.error("SignalR connection / JoinConversation error:", err);
       }
     }
-  
+
     start();
-  
+
     return () => {
-      isMounted = false;
-      connection.stop(); // 🔥 CRITICAL — clean disconnect
+      (async () => {
+        try {
+          if (connectionRef.current?.state === signalR.HubConnectionState.Connected) {
+            await connectionRef.current.invoke("LeaveConversation", conversationId);
+          }
+        } catch (err) {
+          console.warn("Error leaving conversation group", err);
+        }
+        connectionRef.current?.stop();
+        connectionRef.current = null;
+      })();
     };
   }, [conversationId, qc]);
-  
 
-  // ✅ Auto scroll
+  // auto-scroll
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -95,6 +110,7 @@ export function ConversationPage() {
 
   return (
     <div>
+      {/* listing header (as you already had) */}
       {header.data && (
         <div
           onClick={() => nav(`/listings/${header.data.listingId}`)}
@@ -124,9 +140,7 @@ export function ConversationPage() {
           )}
 
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 600 }}>
-              {header.data.listingTitle}
-            </div>
+            <div style={{ fontWeight: 600 }}>{header.data.listingTitle}</div>
             <div style={{ fontSize: 14, opacity: 0.8 }}>
               {header.data.price} {header.data.currency}
             </div>

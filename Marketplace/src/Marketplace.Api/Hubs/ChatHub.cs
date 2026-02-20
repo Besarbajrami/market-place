@@ -4,6 +4,7 @@ using Marketplace.Application.Features.Conversations.Commands.SendMessage;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 
 namespace Marketplace.Api.Hubs;
 
@@ -29,22 +30,49 @@ public sealed class ChatHub : Hub
     // Client calls: joinConversation({conversationId})
     public async Task JoinConversation(Guid conversationId, CancellationToken ct = default)
     {
-        var retries = 5;
 
-        for (int i = 0; i < retries; i++)
+        var httpContext = Context.GetHttpContext();
+
+        Guid userId;
+        try
         {
-            var isParticipant = await _conversations.IsParticipantAsync(conversationId, UserId, ct);
+            // Try to resolve user directly from Hub context, not only ICurrentUserService
+            var userIdString =
+                httpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                httpContext?.User?.FindFirstValue("sub");
 
-            if (isParticipant)
+            if (string.IsNullOrWhiteSpace(userIdString))
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(conversationId), ct);
-                return;
+                throw new HubException("Unauthorized");
             }
 
-            await Task.Delay(100, ct); // wait 100ms and retry
+            if (!Guid.TryParse(userIdString, out userId))
+            {
+                throw new HubException("Unauthorized");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw;
         }
 
-        throw new HubException("Forbidden");
+
+        try
+        {
+            var isParticipant = await _conversations.IsParticipantAsync(conversationId, userId, ct);
+
+            if (!isParticipant)
+            {
+                throw new HubException("Forbidden");
+            }
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(conversationId), ct);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+
     }
 
 

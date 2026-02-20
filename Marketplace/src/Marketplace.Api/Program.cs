@@ -45,6 +45,7 @@ builder.Services.AddAuthentication(options =>
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
+            NameClaimType = "sub",          // 🔥 ADD THIS
         RoleClaimType = ClaimTypes.Role,
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -188,12 +189,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 // --------------------------------------------------
 // SIGNALR & CORS
 // --------------------------------------------------
-// before: builder.Services.AddSignalR();
-builder.Services.AddSignalR(options =>
-{
-    options.EnableDetailedErrors = true;
-});
-
+builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
