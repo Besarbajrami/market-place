@@ -16,13 +16,11 @@ import "./header-adaptive.css";  // Make sure this exists
 setupAuthRefresh();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
     <ThemeProvider> {/* ✅ ADD THIS - Wrap everything */}
       <AppProviders>
         <AuthProvider>
           <RouterProvider router={router} />
         </AuthProvider>
       </AppProviders>
-    </ThemeProvider> {/* ✅ ADD THIS */}
-  </React.StrictMode>
+    </ThemeProvider>
 );
