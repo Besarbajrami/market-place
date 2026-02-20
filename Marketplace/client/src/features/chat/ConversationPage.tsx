@@ -26,10 +26,10 @@ export function ConversationPage() {
     if (connectionRef.current) return; // already connected
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7012/hubs/chat", {
-        accessTokenFactory: () =>
-          localStorage.getItem("mp_access_token") ?? ""
-      })
+    .withUrl("/hubs/chat", {
+      accessTokenFactory: () =>
+        localStorage.getItem("mp_access_token") ?? ""
+    })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
